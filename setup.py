@@ -8,4 +8,7 @@ setup(name='pydiscord',
       author_email='contact@ryobyte.com',
       license='MIT',
       packages=['pydiscord'],
+      install_requires=[
+          'aiohttp',
+      ],
       zip_safe=False)

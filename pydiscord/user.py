@@ -14,11 +14,7 @@ class UserConnection:
 
 
 class User:
-    """Represents a Discord :class:`User` object
-
-    Properties
-    ----------
-    - id (int): The id of the user
+    """Represents a Discord User object
     """
     def __init__(self, id, username, discriminator, avatar, is_bot=False, mfa_enabled=False, verified=False, email=''):
         self.id = id

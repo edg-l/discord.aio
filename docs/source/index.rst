@@ -7,10 +7,12 @@ Welcome to pydiscord's documentation!
 =====================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
+    :caption: Contents:
 
-
+    readme
+    modules
+    changelog
 
 Indices and tables
 ==================

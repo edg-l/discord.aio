@@ -1,7 +1,7 @@
-pydiscord
-=========
+Documentation
+=============
 
 .. toctree::
-   :maxdepth: 4
+    :maxdepth: 4
 
-   pydiscord
+    pydiscord

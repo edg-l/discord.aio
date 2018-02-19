@@ -20,15 +20,6 @@ class HTTPHandler:
             async with session.get(self.discord_url + url) as res:
                 return res
 
-    async def get_user(self, id):
-        res = await self.request_url('/users/' + id)
-        if res.status == 200:
-            text = await res.text()
-            user = json.loads(text)
-            return User(user['id'], user['username'], user['discriminator'], user['avatar'], user['bot'], user['mfa_enabled'], user['verified'], user['email'])
-        else:
-            return None
-
 
 class DiscordBot:
     def __init__(self, token):
@@ -36,7 +27,15 @@ class DiscordBot:
         self.httpHandler = HTTPHandler(token)
 
     async def get_user(self, id):
-        return await self.httpHandler.get_user(id)
-    
+        res = await self.httpHandler.request_url('/users/' + id)
+        if res.status == 200:
+            text = await res.text()
+            user = json.loads(text)
+            return User(user['id'], user['username'], user['discriminator'],
+                        user['avatar'], user['bot'], user['mfa_enabled'],
+                        user['verified'], user['email'])
+        else:
+            return None
+
     async def get_self(self):
         return await self.get_user("@me")

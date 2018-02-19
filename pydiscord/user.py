@@ -14,14 +14,25 @@ class UserConnection:
 
 
 class User:
-    """Represents a Discord User object
-    """
-    def __init__(self, id, username, discriminator, avatar, is_bot=False, mfa_enabled=False, verified=False, email=''):
-        self.id = id
+    """Represents a Discord User object"""
+    def __init__(self, id, username, discriminator, avatar, bot=False, mfa_enabled=False, verified=False, email=''):
+        """The User class constructor
+        
+        Args:
+            id (int): The user's id
+            username (str): The user's username, not unique across the platform
+            discriminator (str): The user's 4-digit discord-tag
+            avatar (str): The user's avatar hash
+            bot (bool, optional): Defaults to False. Whether the user belongs to an OAuth2 application
+            mfa_enabled (bool, optional): Defaults to False. Whether the user has two factor enabled on their account
+            verified (bool, optional): Defaults to False. Whether the email on this account has been verified
+        """
+
+        self.id = int(id)
         self.username = username
         self.discriminator = discriminator
         self.avatar = avatar
-        self.is_bot = is_bot
+        self.bot = bot
         self.mfa_enabled = mfa_enabled
         self.verified = verified
         self.email = email

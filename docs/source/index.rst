@@ -1,5 +1,5 @@
 .. pydiscord documentation master file, created by
-   sphinx-quickstart on Mon Feb 19 16:28:57 2018.
+   sphinx-quickstart on Mon Feb 19 17:55:32 2018.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 

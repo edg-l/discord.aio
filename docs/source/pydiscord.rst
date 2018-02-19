@@ -1,9 +1,3 @@
-pydiscord package
-=================
-
-Submodules
-----------
-
 pydiscord.client module
 -----------------------
 

@@ -27,6 +27,9 @@ class DiscordBot:
         self.httpHandler = HTTPHandler(token)
 
     async def get_user(self, id):
+        """Requests the information of a user
+        """
+
         res = await self.httpHandler.request_url('/users/' + id)
         if res.status == 200:
             text = await res.text()

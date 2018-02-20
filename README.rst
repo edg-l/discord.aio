@@ -1,5 +1,9 @@
 pydiscord
 =========
+.. image:: https://readthedocs.org/projects/pydiscord/badge/?version=latest
+  :target: http://pydiscord.readthedocs.io/en/latest/?badge=latest
+  :alt: Documentation Status
+
 Currently under early development
 
 .. role:: bash(code)

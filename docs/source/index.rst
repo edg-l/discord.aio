@@ -10,9 +10,9 @@ Welcome to pydiscord's documentation!
     :maxdepth: 2
     :caption: Contents:
 
-    .. include:: ../../README.rst
+    readme
     modules
-    .. include:: ../../CHANGELOG.rst
+    changelog
 
 Indices and tables
 ==================

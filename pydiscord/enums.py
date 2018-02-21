@@ -23,3 +23,18 @@ class VerificationLevel(Enum):
     MEDIUM = 2
     HIGH = 3
     VERY_HIGH = 4
+
+
+class ChannelTypes(Enum):
+    GUILD_TEXT = 0
+    DM = 1
+    GUILD_VOICE = 2
+    GROUP_DM = 3
+    GUILD_CATEGORY = 4
+
+
+class MessageActivityTypes(Enum):
+    JOIN = 1
+    SPECTATE = 2
+    LISTEN = 3
+    JOIN_REQUEST = 5

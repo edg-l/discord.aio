@@ -3,7 +3,6 @@ import asyncio
 import json
 import time
 import logging
-from typing import Callable
 from .user import User
 from .guild import Guild, GuildMember
 from .base import DiscordObject

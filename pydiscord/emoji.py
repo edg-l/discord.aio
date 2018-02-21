@@ -3,6 +3,7 @@ import json
 from .base import DiscordObject
 from .internal_util import get_class_list
 from .user import User
+from .constants import DISCORD_CDN
 
 
 class Emoji(DiscordObject):
@@ -26,3 +27,6 @@ class Emoji(DiscordObject):
             else:
                 setattr(obj, key, value)
         return obj
+    
+    def get_url(self):
+        return DISCORD_CDN + f'/emojis/{self.id}.png'

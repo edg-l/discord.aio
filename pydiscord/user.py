@@ -4,7 +4,7 @@ Although they are similar, bot users are automated users that are "owned" by ano
 bot users do not have a limitation on the number of Guilds they can be a part of."""
 
 from .base import DiscordObject
-
+from .constants import DISCORD_CDN
 
 class UserConnection(DiscordObject):
     """A Discord User Connection"""
@@ -36,3 +36,9 @@ class User(DiscordObject):
 
     def __repr__(self):
         return "({0}#{1}, {2})".format(self.username, self.discriminator, self.id)
+    
+    def get_avatar_url(self):
+        return DISCORD_CDN + f'/avatars/{self.id}/{self.avatar}.png'
+
+    def get_default_avatar_url(self):
+        return DISCORD_CDN + f'/embed/avatars/{int(self.discriminator) % 5}.png'

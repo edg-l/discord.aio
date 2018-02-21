@@ -6,6 +6,7 @@ import logging
 from .user import User
 from .guild import Guild, GuildMember
 from .base import DiscordObject
+from .version import VERSION_STR
 
 FORMAT = '%(asctime)-15s: %(message)s'
 logging.basicConfig(level=logging.DEBUG)
@@ -25,10 +26,11 @@ class HTTPHandler:
         self.loop = asyncio.get_event_loop()
         self.headers = ''
         self.discord_url = 'https://discordapp.com/api'
+        self.discord_cdn = 'https://cdn.discordapp.com'
         self.update_headers()
 
     def update_headers(self):
-        self.headers = {'Authorization': 'Bot ' + self.token}
+        self.headers = {'Authorization': 'Bot ' + self.token, 'User-Agent': f'DiscordBot (https://github.com/Ryozuki/pydiscord, {VERSION_STR})'}
 
     async def request_url(self, url):
         while True:
@@ -104,6 +106,9 @@ class DiscordBot:
         """Requests information about the current user."""
 
         return await self.get_user("@me")
+    
+    def get_user_avatar_url(self, user):
+        return self.httpHandler.discord_cdn + f'/avatars/{user.id}/{user.avatar}.png'
 
     async def get_guilds(self):
         """Returns the list of guilds that the user belongs to.

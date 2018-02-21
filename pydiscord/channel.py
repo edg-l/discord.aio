@@ -42,6 +42,91 @@ class MessageApplication(DiscordObject):
         self.name = name
 
 
+class Overwrite(DiscordObject):
+    def __init__(self, id=0, type="", allow=0, deny=0):
+        self.id = id
+        self.type = type
+        self.allow = allow
+        self.deny = deny
+
+
+class Reaction(DiscordObject):
+    def __init__(self, count=0, me=False, emoji=None):
+        self.count = count
+        self.me = me
+        self.emoji = emoji
+
+
+class EmbedThumbnail(DiscordObject):
+    def __init__(self, url="", proxy_url="", height=0, width=0):
+        self.url = url
+        self.proxy_url = proxy_url
+        self.height = height
+        self.width = width
+
+
+class EmbedVideo(DiscordObject):
+    def __init__(self, url="", height=0, width=0):
+        self.url = url
+        self.height = height
+        self.width = width
+
+
+class EmbedImage(DiscordObject):
+    def __init__(self, url="", proxy_url="", height=0, width=0):
+        self.url = url
+        self.proxy_url = proxy_url
+        self.height = height
+        self.width = width
+
+
+class EmbedProvider(DiscordObject):
+    def __init__(self, name="", url=""):
+        self.name = name
+        self.url = url
+
+
+class EmbedAuthor(DiscordObject):
+    def __init__(self, name="", url="", icon_url="", proxy_icon_url=""):
+        self.name = name
+        self.url = url
+        self.icon_url = icon_url
+        self.proxy_icon_url = proxy_icon_url
+
+
+class EmbedFooter(DiscordObject):
+    def __init__(self, text="", icon_url="", proxy_icon_url=""):
+        self.text = text
+        self.icon_url = icon_url
+        self.proxy_icon_url = proxy_icon_url
+
+
+class EmbedField(DiscordObject):
+    def __init__(self, name="", value="", inline=False):
+        self.name = name
+        self.value = value
+        self.inline = inline
+
+
+class Embed(DiscordObject):
+    def __init__(self, title="", type="", description="", url="", timestamp=None,
+                 color=0, footer=EmbedFooter(), image=EmbedImage(), thumbnail=EmbedThumbnail(),
+                 video=EmbedVideo(), provider=EmbedProvider(), author=EmbedAuthor(), fields=[]):
+        self.title = title
+        self.type = type
+        self.description = description
+        self.url = url
+        self.timestamp = timestamp
+        self.color = color
+        self.footer = footer
+        self.image = image
+        self.thumbnail = thumbnail
+        self.video = video
+        self.provider = provider
+        self.author = author
+        self.fields = fields
+
+
 class ChannelMessage(DiscordObject):
     """Represents a message sent in a channel within Discord."""
 

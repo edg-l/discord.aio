@@ -8,6 +8,7 @@ from .guild import Guild, GuildMember
 from .base import DiscordObject
 from .version import VERSION_STR
 from .constants import DISCORD_API_URL
+from .channel import Channel
 
 FORMAT = '%(asctime)-15s: %(message)s'
 logging.basicConfig(level=logging.DEBUG)
@@ -27,49 +28,54 @@ class HTTPHandler:
         self.loop = asyncio.get_event_loop()
         self.headers = ''
         self.update_headers()
+        self.session = None
+
+    async def create_session(self):
+        self.session = aiohttp.ClientSession(headers=self.headers)
 
     def update_headers(self):
-        self.headers = {'Authorization': 'Bot ' + self.token, 'User-Agent': f'DiscordBot (https://github.com/Ryozuki/pydiscord, {VERSION_STR})'}
+        self.headers = {'Authorization': 'Bot ' + self.token,
+                        'User-Agent': f'DiscordBot (https://github.com/Ryozuki/pydiscord, {VERSION_STR})'}
 
     async def request_url(self, url, type='GET', data=None):
         while True:
-            async with aiohttp.ClientSession(headers=self.headers) as session:
-                operation = None
-                if type == 'GET':
-                    operation = session.get(DISCORD_API_URL + url)
-                elif type == 'POST':
-                     operation = session.post(DISCORD_API_URL + url, data)
-                elif type == 'DELETE':
-                    operation = session.delete(DISCORD_API_URL + url)
+            operation = None
+            if type == 'GET':
+                operation = self.session.get(DISCORD_API_URL + url)
+            elif type == 'POST':
+                operation = self.session.post(DISCORD_API_URL + url, data)
+            elif type == 'DELETE':
+                operation = self.session.delete(DISCORD_API_URL + url)
 
-                async with operation as res:
-                    logger.debug(await res.text())
-                    logger.debug(res.status)
-                    if res.status == 429:
-                        text = await res.text()
-                        limit = RateLimit.from_json(text)
-                        # TODO: Handle global rate limit?
+            async with operation as res:
+                # logger.debug(await res.text())
+                # logger.debug(res.status)
+                if res.status == 429:
+                    text = await res.text()
+                    limit = RateLimit.from_json(text)
+                    # TODO: Handle global rate limit?
 
-                        if 'X-RateLimit-Remaining' in res.headers and int(res.headers['X-RateLimit-Remaining']) > 0:
-                            logger.debug(f"Status is {res.status} but i have {res.headers['X-RateLimit-Remaining']} ratelimits remaining, ")
-                            continue
-
+                    if 'X-RateLimit-Remaining' in res.headers and int(res.headers['X-RateLimit-Remaining']) > 0:
                         logger.debug(
-                            f"Status is {res.status} so we must wait {limit.retry_after / 1000} seconds!")
-                        await asyncio.sleep(limit.retry_after / 1000)
-                        logger.debug("Done waiting! Requesting again")
-                    elif res.status == 200:
-                        return res
-                    elif res.status == 204 and type == 'DELETE':
-                        return res
-                    elif res.status == 401:
-                        text = await res.text()
-                        logger.warning(f"You requested a api endpoint which you have no authorization: {text}")
-                        return res 
-                    else:
-                        logger.warning(
-                            f"Unhandled response status when requesting url = '{url}'")
-                        return res
+                            f"Status is {res.status} but i have {res.headers['X-RateLimit-Remaining']} ratelimits remaining, ")
+                        continue
+
+                    logger.debug(
+                        f"Status is {res.status} so we must wait {limit.retry_after / 1000} seconds!")
+                    await asyncio.sleep(limit.retry_after / 1000)
+                    logger.debug("Done waiting! Requesting again")
+                elif res.status == 200:
+                    return res
+                elif res.status == 204 and type == 'DELETE':
+                    return res
+                elif res.status == 401:
+                    logger.warning(
+                        f"You requested a api endpoint which you have no authorization: {text}")
+                    return res
+                else:
+                    logger.warning(
+                        f"Unhandled response status when requesting url = '{url}'")
+                    return res
 
 
 class DiscordBot:
@@ -81,11 +87,10 @@ class DiscordBot:
         """
         self.token = token
         self.httpHandler = HTTPHandler(token)
-        loop = asyncio.get_event_loop()
-        self.user = loop.run_until_complete(self.get_self_user())
-
-    def run(self):
-        loop = asyncio.get_event_loop()
+    
+    async def start(self):
+        await self.httpHandler.create_session()
+        self.user = await self.get_self_user()
 
     async def event(self, func):
         if func.__name__ == 'on_message':
@@ -139,36 +144,46 @@ class DiscordBot:
 
     async def get_guild_members(self, guild: Guild):
         """Gets and fills the guild with it's members info
-        
+
         Returns:
             bool: True if succeeds, False if not."""
         res = await self.httpHandler.request_url('/guilds/' + guild.id + '/members')
         if res.status == 200:
             text = await res.text()
-            logger.debug(text)
             guild._fill_members(text)
             return True
         else:
             return False
 
-    async def get_guild_member(self, guild: Guild, id):
-        res = await self.httpHandler.request_url('/guilds/' + guild.id + '/members/' + id)
+    async def get_guild_member(self, guild: Guild, member_id):
+        res = await self.httpHandler.request_url('/guilds/' + guild.id + '/members/' + member_id)
         if res.status == 200:
             text = await res.text()
-            logger.debug(text)
             return GuildMember.from_json(text)
         else:
             return None
-    
-    async def leave_guild(self, id):
-        res = await self.httpHandler.request_url(f'/users/@me/guilds/{id}', type='DELETE')
+
+    async def leave_guild(self, guild_id):
+        res = await self.httpHandler.request_url(f'/users/@me/guilds/{guild_id}', type='DELETE')
         if res.status == 204:
-            text = await res.text()
-            logger.debug(text)
             return True
         else:
             return False
 
+    async def get_channel(self, channel_id):
+        res = await self.httpHandler.request_url(f'/channels/{channel_id}')
+        if res.status == 200:
+            text = await res.text()
+            return Channel.from_json(text)
+        else:
+            return None
+    
+    async def delete_channel(self, channel_id):
+        res = await self.httpHandler.request_url(f'/channels/{channel_id}', type='DELETE')
+        if res.status == 204:
+            return True
+        else:
+            return False
 
     async def get_dms(self):
         pass  # TODO: Implement this: https://discordapp.com/developers/docs/resources/user#modify-current-user

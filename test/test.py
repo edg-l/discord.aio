@@ -5,25 +5,27 @@ from pydiscord.client import DiscordBot
 
 TOKEN = os.environ['PYDISCORD_TEST_TOKEN']
 
+TEST_CHANNEL_ID = 277108288925990912
+TEST_GUILD_ID = 97740313094782976
 
 class TestMethods(unittest.TestCase):
+    bot = DiscordBot(TOKEN)
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(bot.start())
+    do_async = loop.run_until_complete
 
     def test_bot(self):
-        bot = DiscordBot(TOKEN)
-        loop = asyncio.get_event_loop()
-        # guilds = loop.run_until_complete(bot.get_guilds())
-        # guild = loop.run_until_complete(bot.get_guild('97740313094782976'))
-        # print(guild.roles[0].name)
-        
-        # loop.run_until_complete(bot.get_guild_members(guild))
-        # print(guild.members)
-        # print(len(guild.members))
-        # print(guild.members[0].user)
+        self.assertTrue(self.bot.user.bot)
 
-        print(bot.user.get_default_avatar_url())
+    def test_bot_name(self):
+        self.assertEqual(str(self.bot.user), 'RyoBot#8144')
 
-        self.assertTrue(bot.user.bot)
-        self.assertEqual(str(bot.user), 'RyoBot#8144')
+    def test_channel_name(self):
+        self.assertEqual(self.do_async(
+            self.bot.get_channel(TEST_CHANNEL_ID)).name, 'welcome')
+
+    def test_get_guild(self):
+        self.assertIsNotNone(self.do_async(self.bot.get_guild(TEST_GUILD_ID)))
 
 
 if __name__ == '__main__':

@@ -31,10 +31,18 @@ class HTTPHandler:
     def update_headers(self):
         self.headers = {'Authorization': 'Bot ' + self.token, 'User-Agent': f'DiscordBot (https://github.com/Ryozuki/pydiscord, {VERSION_STR})'}
 
-    async def request_url(self, url):
+    async def request_url(self, url, type='GET', data=None):
         while True:
             async with aiohttp.ClientSession(headers=self.headers) as session:
-                async with session.get(DISCORD_API_URL + url) as res:
+                operation = None
+                if type == 'GET':
+                    operation = session.get(DISCORD_API_URL + url)
+                elif type == 'POST':
+                     operation = session.post(DISCORD_API_URL + url, data)
+                elif type == 'DELETE':
+                    operation = session.delete(DISCORD_API_URL + url)
+
+                async with operation as res:
                     logger.debug(await res.text())
                     logger.debug(res.status)
                     if res.status == 429:
@@ -51,6 +59,8 @@ class HTTPHandler:
                         await asyncio.sleep(limit.retry_after / 1000)
                         logger.debug("Done waiting! Requesting again")
                     elif res.status == 200:
+                        return res
+                    elif res.status == 204 and type == 'DELETE':
                         return res
                     elif res.status == 401:
                         text = await res.text()
@@ -149,6 +159,16 @@ class DiscordBot:
             return GuildMember.from_json(text)
         else:
             return None
+    
+    async def leave_guild(self, id):
+        res = await self.httpHandler.request_url(f'/users/@me/guilds/{id}', type='DELETE')
+        if res.status == 204:
+            text = await res.text()
+            logger.debug(text)
+            return True
+        else:
+            return False
+
 
     async def get_dms(self):
         pass  # TODO: Implement this: https://discordapp.com/developers/docs/resources/user#modify-current-user

@@ -10,7 +10,7 @@ class TestMethods(unittest.TestCase):
 
     def test_bot(self):
         bot = DiscordBot(TOKEN)
-        # loop = asyncio.get_event_loop()
+        loop = asyncio.get_event_loop()
         # guilds = loop.run_until_complete(bot.get_guilds())
         # guild = loop.run_until_complete(bot.get_guild('97740313094782976'))
         # print(guild.roles[0].name)
@@ -19,6 +19,7 @@ class TestMethods(unittest.TestCase):
         # print(guild.members)
         # print(len(guild.members))
         # print(guild.members[0].user)
+
         print(bot.user.get_default_avatar_url())
 
         self.assertTrue(bot.user.bot)

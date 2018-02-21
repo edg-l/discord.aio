@@ -1,7 +1,7 @@
 import unittest
 import asyncio
 import os
-from pydiscord import DiscordBot
+from pydiscord.client import DiscordBot
 
 TOKEN = os.environ['PYDISCORD_TEST_TOKEN']
 

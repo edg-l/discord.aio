@@ -1,8 +1,14 @@
+"""Users in Discord are generally considered the base entity. Users can spawn across the entire platform,
+be members of guilds, participate in text and voice chat, and much more. Users are separated by a distinction of "bot" vs "normal." 
+Although they are similar, bot users are automated users that are "owned" by another user. Unlike normal users, 
+bot users do not have a limitation on the number of Guilds they can be a part of."""
+
 from .base import DiscordObject
 
 
 class UserConnection(DiscordObject):
     """A Discord User Connection"""
+
     def __init__(self, id="", name="", type="", revoked=False, integrations=[]):
         self.id = id
         self.name = name

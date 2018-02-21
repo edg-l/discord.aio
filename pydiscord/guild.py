@@ -1,4 +1,27 @@
+import logging
+import json
+
 from .base import DiscordObject
+from .user import User
+from .emoji import Emoji
+from .internal_util import get_class_list
+
+FORMAT = '%(asctime)-15s: %(message)s'
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger('DiscordClient')
+
+
+class Role(DiscordObject):
+    def __init__(self, id=0, name="", color=0, hoist=False, position=0,
+                 permissions=0, managed=False, mentionable=False):
+        self.id = id
+        self.name = name
+        self.color = color
+        self.hoist = hoist
+        self.position = position
+        self.permissions = permissions
+        self.managed = managed
+        self.mentionable = mentionable
 
 
 class GuildEmbed(DiscordObject):
@@ -10,7 +33,7 @@ class GuildEmbed(DiscordObject):
 
 
 class GuildMember(DiscordObject):
-    def __init__(self, user=None, nick="", roles=[], joined_at=None, deaf=False,
+    def __init__(self, user=User(), nick="", roles=[], joined_at=None, deaf=False,
                  mute=False):
         self.user = user
         self.nick = nick
@@ -18,6 +41,16 @@ class GuildMember(DiscordObject):
         self.joined_at = joined_at
         self.deaf = deaf
         self.mute = mute
+
+    @classmethod
+    def from_dict(cls, dct: dict):
+        obj = cls()
+        for key, value in dct.items():
+            if key == 'user':
+                setattr(obj, key, User.from_dict(value))
+            else:
+                setattr(obj, key, value)
+        return obj
 
 
 class Guild(DiscordObject):
@@ -29,7 +62,7 @@ class Guild(DiscordObject):
                  default_message_notifications=0, explicit_content_filter=0, roles=[], emojis=[],
                  features=[], mfa_level=0, application_id=0, widget_enabled=False,
                  widget_channel_id=0, system_channel_id=0, joined_at=None, large=None,
-                 unavailable=None, member_count=None, voice_states=None, members=None,
+                 unavailable=None, member_count=None, voice_states=None, members=[],
                  channels=None, presences=None):
         self.id = id
         self.name = name
@@ -62,6 +95,48 @@ class Guild(DiscordObject):
         self.members = members
         self.channels = channels
         self.presences = presences
+
+    @classmethod
+    def from_json(cls, text: str):
+        obj = cls()
+        json_text = json.loads(text)
+        for key, value in json_text.items():
+            if key == 'roles':
+                setattr(obj, key, get_class_list(Role, value))
+            elif key == 'members':
+                setattr(obj, key, get_class_list(GuildMember, value))
+            elif key == 'emojis':
+                setattr(obj, key, get_class_list(Emoji, value))
+            else:
+                setattr(obj, key, value)
+        return obj
+
+    @classmethod
+    def from_json_array(cls, text: str):
+        objs = []
+        json_text = json.loads(text)
+        # print(json_text)
+        for jobj in json_text:
+            c = cls()
+            for key, value in jobj.items():
+
+                if key == 'roles':
+                    setattr(c, key, get_class_list(Role, value))
+                elif key == 'members':
+                    setattr(c, key, get_class_list(GuildMember, value))
+                else:
+                    setattr(c, key, value)
+            objs.append(c)
+        return objs
+
+    def _fill_members(self, json_text):
+        members = json.loads(json_text)
+        self.members = []
+        for member in members:
+            self.members.append(GuildMember.from_dict(member))
+
+    def is_owner(self, member: GuildMember):
+        return self.owner_id == member.user.id
 
 
 class Integration(DiscordObject):

@@ -1,4 +1,6 @@
 from .base import DiscordObject
+from .user import User
+from .internal_util import get_class_list
 
 
 class Channel(DiscordObject):
@@ -26,6 +28,15 @@ class Channel(DiscordObject):
         self.parent_id = parent_id
         self.last_pin_timestamp = last_pin_timestamp
 
+    @classmethod
+    def from_dict(cls, dct: dict):
+        obj = cls()
+        for key, value in dct.items():
+            if key == 'recipients':
+                setattr(obj, key, get_class_list(User, value))
+            else:
+                setattr(obj, key, value)
+        return obj
 
 class MessageActivity(DiscordObject):
     def __init__(self, type=None, party_id=""):
@@ -125,6 +136,18 @@ class Embed(DiscordObject):
         self.provider = provider
         self.author = author
         self.fields = fields
+
+
+class Attachment(DiscordObject):
+    def __init__(self, id=0, filename="", size=0, url="", proxy_url="",
+                 height=0, width=0):
+        self.id = id
+        self.filename = filename
+        self.size = size
+        self.url = url
+        self.proxy_url = proxy_url
+        self.height = height
+        self.width = width
 
 
 class ChannelMessage(DiscordObject):

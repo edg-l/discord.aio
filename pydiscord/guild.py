@@ -5,6 +5,7 @@ from .base import DiscordObject
 from .user import User
 from .emoji import Emoji
 from .internal_util import get_class_list
+from .constants import DISCORD_CDN
 
 FORMAT = '%(asctime)-15s: %(message)s'
 logging.basicConfig(level=logging.DEBUG)
@@ -137,7 +138,12 @@ class Guild(DiscordObject):
 
     def is_owner(self, member: GuildMember):
         return self.owner_id == member.user.id
-
+    
+    def get_icon(self):
+        return DISCORD_CDN + f'/icons/{self.id}/{self.icon}.png'
+    
+    def get_splash(self):
+        return DISCORD_CDN + f'/splashes/{self.id}/{self.splash}.png'
 
 class Integration(DiscordObject):
     def __init__(self, id=0, name="", type="", enabled=False, syncing=False,

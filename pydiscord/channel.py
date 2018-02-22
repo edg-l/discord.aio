@@ -37,6 +37,17 @@ class Channel(DiscordObject):
             else:
                 setattr(obj, key, value)
         return obj
+    
+    @classmethod
+    def from_dict_array(cls, lst: list):
+        for channel in lst:
+            obj = cls()
+            for key, value in channel.items():
+                if key == 'recipients':
+                    setattr(obj, key, get_class_list(User, value))
+                else:
+                    setattr(obj, key, value)
+            yield obj
 
 class MessageActivity(DiscordObject):
     def __init__(self, type=None, party_id=""):

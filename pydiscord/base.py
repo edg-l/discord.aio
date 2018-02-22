@@ -13,15 +13,13 @@ class DiscordObject:
 
     @classmethod
     def from_json_array(cls, text: str):
-        objs = []
         json_text = json.loads(text)
         #print(json_text)
         for jobj in json_text:
             c = cls()
             for key, value in jobj.items():
                 setattr(c, key, value)
-            objs.append(c)
-        return objs
+            yield c
 
     @classmethod
     def from_dict(cls, dct: dict):
@@ -29,3 +27,11 @@ class DiscordObject:
         for key, value in dct.items():
             setattr(obj, key, value)
         return obj
+    
+    @classmethod
+    def from_dict_array(cls, lst: list):
+        for x in lst:
+            obj = cls()
+            for key, value in x.items():
+                setattr(obj, key, value)
+            yield obj

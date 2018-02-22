@@ -22,8 +22,8 @@ sys.path.insert(0, os.path.abspath('../'))
 # -- Project information -----------------------------------------------------
 
 project = 'pydiscord'
-copyright = '2018, Edgar Luque'
-author = 'Edgar Luque'
+copyright = '2018, Ryozuki'
+author = 'Ryozuki'
 
 # The short X.Y version
 version = '0.1'

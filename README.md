@@ -4,8 +4,12 @@
 
 *Currently under very early development*
 
+## Documentation
+You can find the module documentation here: https://ryozuki.github.io/pydiscord/docs
+
 ## Local development
-- `cd pydiscord && pip3 install -e .` (Will create a symlink to this module)
+- `git clone https://github.com/Ryozuki/pydiscord`
+- `cd pydiscord && pip3 install -e .`
 
 ## TODO
 - [Add compression support](https://discordapp.com/developers/docs/topics/gateway#encoding-and-compression)

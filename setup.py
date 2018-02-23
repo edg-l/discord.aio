@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='pydiscord',
-      version='0.1.1',
+      version='0.1.2',
       description='Discord API wrapper',
       url='https://github.com/Ryozuki/pydiscord',
       author='Ryozuki',

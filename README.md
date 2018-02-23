@@ -4,8 +4,10 @@
 
 *Currently under very early development*
 
+Read this readme with a cool theme here: [ryozuki.github.io/discord.aio/](https://ryozuki.github.io/discord.aio/)
+
 ## Documentation
-You can find the module documentation here: https://ryozuki.github.io/discord.aio/docs
+You can find the module documentation here: [documentation](https://ryozuki.github.io/discord.aio/docs)
 
 ## Installation
 

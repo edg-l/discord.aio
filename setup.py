@@ -1,9 +1,17 @@
 from setuptools import setup
 
+try:
+    import pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
+except(IOError, ImportError):
+    long_description = open('README.md').read()
+
 setup(name='discord.aio',
-      version='0.1.4',
+      version='0.1.5.1',
       description='discord.aio is a asynchronous Discord API wrapper for asyncio and python',
+      long_description=long_description,
       url='https://github.com/Ryozuki/discord.aio',
+      download_url='https://github.com/Ryozuki/discord.aio/archive/0.1.4.tar.gz',
       author='Ryozuki',
       author_email='contact@ryobyte.com',
       license='MIT',
@@ -23,10 +31,12 @@ setup(name='discord.aio',
           #   5 - Production/Stable
           'Development Status :: 2 - Pre-Alpha',
 
-          'Framework :: AsyncIO',
-
           # Indicate who your project is intended for
           'Intended Audience :: Developers',
+          'Natural Language :: English',
+          'Operating System :: OS Independent',
+          'Topic :: Utilities',
+          'Topic :: Software Development :: Libraries',
           'Topic :: Software Development :: Libraries :: Python Modules',
 
           # Pick your license as you wish (should match "license" above)

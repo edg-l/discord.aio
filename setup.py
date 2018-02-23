@@ -1,13 +1,13 @@
 from setuptools import setup
 
-setup(name='pydiscord',
+setup(name='discord.aio',
       version='0.1.3',
-      description='PyDiscord is an asynchronous Discord API wrapper',
-      url='https://github.com/Ryozuki/pydiscord',
+      description='discord.aio is a asynchronous Discord API wrapper for asyncio and python',
+      url='https://github.com/Ryozuki/discord.aio',
       author='Ryozuki',
       author_email='contact@ryobyte.com',
       license='MIT',
-      packages=['pydiscord'],
+      packages=['discord.aio'],
       install_requires=[
           'aiohttp',
       ],
@@ -27,7 +27,7 @@ setup(name='pydiscord',
 
           # Indicate who your project is intended for
           'Intended Audience :: Developers',
-          'Topic :: Communications',
+          'Software Development :: Libraries :: Python Modules',
 
           # Pick your license as you wish (should match "license" above)
           'License :: OSI Approved :: MIT License',

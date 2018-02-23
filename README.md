@@ -1,15 +1,15 @@
-# PyDiscord
+# discord.aio
 
-> PyDiscord is an asynchronous Discord API wrapper
+> discord.aio is an asynchronous Discord API wrapper
 
 *Currently under very early development*
 
 ## Documentation
-You can find the module documentation here: https://ryozuki.github.io/pydiscord/docs
+You can find the module documentation here: https://ryozuki.github.io/discord.aio/docs
 
 ## Local development
-- `git clone https://github.com/Ryozuki/pydiscord`
-- `cd pydiscord && pip3 install -e .`
+- `git clone https://github.com/Ryozuki/discord.aio`
+- `cd discord.aio && pip3 install -e .`
 
 ## TODO
 - [Add compression support](https://discordapp.com/developers/docs/topics/gateway#encoding-and-compression)

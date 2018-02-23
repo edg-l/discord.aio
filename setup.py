@@ -7,7 +7,7 @@ setup(name='discord.aio',
       author='Ryozuki',
       author_email='contact@ryobyte.com',
       license='MIT',
-      packages=['discord.aio'],
+      packages=['discordaio'],
       install_requires=[
           'aiohttp',
       ],

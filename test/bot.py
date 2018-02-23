@@ -2,7 +2,7 @@
 
 import os
 import logging
-from pydiscord import DiscordBot
+from discordaio import DiscordBot
 
 logging.basicConfig(
     level='DEBUG', format='%(asctime)s - %(name)s - %(levelname)s: %(message)s')

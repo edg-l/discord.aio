@@ -40,11 +40,6 @@ class HTTPHandler:
     async def close_session(self):
         await self.session.close()
 
-    async def start_websocket_in_thread(self):
-        #self.loop = asyncio.new_event_loop()
-        await self.start_websocket()
-        # self.loop.close()
-
     async def start_websocket(self):
         info = await self.request_url('/gateway/bot')
         self.gateway_url = info['url']
@@ -98,7 +93,7 @@ class HTTPHandler:
                             self.discord_client.user = await User.from_api_res(data['user'])
                             self.discord_client.guilds = await Guild.from_api_res(data['guilds'])
                             asyncio.ensure_future(
-                                self.discord_client.raise_event('on_ready', dct['d']))
+                                self.discord_client.raise_event('on_ready'))
 
     async def send_heartbeat(self, ws):
         while True:

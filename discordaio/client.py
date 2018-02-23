@@ -37,6 +37,7 @@ class DiscordBot:
         self.loop = asyncio.get_event_loop()
         self.do_sync = self.loop.run_until_complete
         self.loop.add_signal_handler(signal.SIGINT, task_handler)
+        self.user = User()
 
     def run(self):
         try:
@@ -53,9 +54,11 @@ class DiscordBot:
     async def raise_event(self, event, *args, **kwargs):
         try:
             await getattr(self, event)(*args, **kwargs)
-        except asyncio.CancelledError:
+        except asyncio.CancelledError as e:
+            logger.error(e, exc_info=1)
             pass
-        except Exception:
+        except Exception as e:
+            logger.error(e, exc_info=1)
             # TODO: handle error here
             pass
 
@@ -125,7 +128,7 @@ class DiscordBot:
         """Gets and fills the guild with it's members info"""
 
         res = await self.httpHandler.request_url('/guilds/' + guild.id + '/members')
-        guild._fill_members(res)
+        await guild._fill_members(res)
 
     async def get_guild_member(self, guild: Guild, member_id):
         res = await self.httpHandler.request_url('/guilds/' + guild.id + '/members/' + member_id)

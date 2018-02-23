@@ -9,6 +9,7 @@ from .channel import Channel
 import logging
 logger = logging.getLogger(__name__)
 
+
 class Role(DiscordObject):
     def __init__(self, id=0, name="", color=0, hoist=False, position=0,
                  permissions=0, managed=False, mentionable=False):
@@ -20,12 +21,12 @@ class Role(DiscordObject):
         self.permissions = permissions
         self.managed = managed
         self.mentionable = mentionable
-    
+
     def __str__(self):
         return self.name
 
     def __repr__(self):
-        return f'{self.name}#{self.id}'
+        return f'<Role Object: {self.name}#{self.id}>'
 
 
 class GuildEmbed(DiscordObject):
@@ -45,6 +46,18 @@ class GuildMember(DiscordObject):
         self.joined_at = joined_at
         self.deaf = deaf
         self.mute = mute
+
+    async def _from_api_ext(self, key, value):
+        if key == 'user':
+            setattr(self, key, await User.from_api_res(value))
+        else:
+            await super()._from_api_ext(key, value)
+
+    def __str__(self):
+        return self.user.__str__()
+
+    def __repr__(self):
+        return f'<GuildMember Object: {self.user.username}#{self.user.discriminator}>'
 
 
 class Guild(DiscordObject):
@@ -92,18 +105,16 @@ class Guild(DiscordObject):
 
     async def _from_api_ext(self, key, value):
         if key == 'roles':
-            #setattr(self, key, get_class_list(Role, value))
             setattr(self, key, [await Role.from_api_res(x) for x in value])
             pass
         elif key == 'members':
-            # logger.debug([GuildMember.from_api_res(x) async for x in value])
             setattr(self, key, [await GuildMember.from_api_res(x) for x in value])
             pass
         elif key == 'emojis':
-            #setattr(self, key, get_class_list(Emoji, value))
+            setattr(self, key, [await Emoji.from_api_res(x) for x in value])
             pass
         elif key == 'channels':
-            #setattr(self, key, get_class_list(Channel, value))
+            setattr(self, key, [await Channel.from_api_res(x) for x in value])
             pass
         else:
             await super()._from_api_ext(key, value)
@@ -122,6 +133,18 @@ class Guild(DiscordObject):
     def get_splash(self):
         return DISCORD_CDN + f'/splashes/{self.id}/{self.splash}.png'
 
+    def __str__(self):
+        return f'{self.name}#{self.id}'
+
+    def __repr__(self):
+        return f'<Guild Object: {self.name}#{self.id}>'
+
+
+class IntegrationAccount(DiscordObject):
+    def __init__(self, id="", name=""):
+        self.id = id
+        self.name = name
+
 
 class Integration(DiscordObject):
     def __init__(self, id=0, name="", type="", enabled=False, syncing=False,
@@ -139,14 +162,22 @@ class Integration(DiscordObject):
         self.account = account
         self.synced_at = synced_at
 
-
-class IntegrationAccount(DiscordObject):
-    def __init__(self, id="", name=""):
-        self.id = id
-        self.name = name
+    async def _from_api_ext(self, key, value):
+        if key == 'user':
+            setattr(self, key, await User.from_api_res(value))
+        elif key == 'account':
+            setattr(self, key, await IntegrationAccount.from_api_res(value))
+        else:
+            return await super()._from_api_ext(key, value)
 
 
 class Ban(DiscordObject):
     def __init__(self, reason="", user=None):
         self.reason = reason
         self.user = user
+    
+    async def _from_api_ext(self, key, value):
+        if key == 'user':
+            setattr(self, key, await User.from_api_res(value))
+        else:
+            return await super()._from_api_ext(key, value)

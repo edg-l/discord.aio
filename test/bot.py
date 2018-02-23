@@ -4,8 +4,8 @@ import os
 import logging
 from pydiscord import DiscordBot
 
-import logging
-logging.basicConfig(level='DEBUG', format='%(asctime)s - %(name)s - %(levelname)s: %(message)s')
+logging.basicConfig(
+    level='DEBUG', format='%(asctime)s - %(name)s - %(levelname)s: %(message)s')
 logger = logging.getLogger('test_bot')
 
 if __name__ == '__main__':

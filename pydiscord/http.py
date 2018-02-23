@@ -1,11 +1,8 @@
 import aiohttp
 import asyncio
 import json
-import time
 import logging
-import threading
 import platform
-from concurrent.futures import ProcessPoolExecutor
 
 from .user import User, UserConnection
 from .guild import Guild, GuildMember
@@ -13,12 +10,11 @@ from .base import DiscordObject
 from .version import PYDISCORD_VERSION_STR
 from .constants import DISCORD_API_URL
 from .channel import Channel
-from .exceptions import WebSocketCreationError
+from .exceptions import WebSocketCreationError, AuthorizationError, UnhandledEndpointStatusError
 from .enums import GatewayOpcodes
 
-FORMAT = '%(asctime)-15s: %(message)s'
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger('DiscordClient')
+import logging
+logger = logging.getLogger(__name__)
 
 
 class RateLimit(DiscordObject):
@@ -35,11 +31,11 @@ class HTTPHandler:
         self.headers = ''
         self.update_headers()
         self.session = None
-        self.executor = ProcessPoolExecutor(2)
         self.discord_client = discord_client
 
     async def create_session(self):
-        self.session = aiohttp.ClientSession(headers=self.headers, auto_decompress=True)
+        self.session = aiohttp.ClientSession(
+            headers=self.headers, auto_decompress=True)
 
     async def close_session(self):
         await self.session.close()
@@ -50,56 +46,59 @@ class HTTPHandler:
         # self.loop.close()
 
     async def start_websocket(self):
-        res = await self.request_url('/gateway/bot')
-        if res.status == 200:
-            info = await res.json()
-            self.gateway_url = info['url']
-            self.shards = info['shards']
-            logger.debug(f'I can use {self.shards} shards!')
-            self.heartbeat_interval = None
-            self._trace = None
-            self.s = None
-            self.heartbeat_future = None
-            self.session_id = None
-            async with self.session.ws_connect(self.gateway_url + '?v=6&encoding=json') as ws:
-                async for msg in ws:
-                    # logger.debug(msg)
-                    if msg.type == aiohttp.WSMsgType.TEXT:
-                        dct = json.loads(msg.data)
-                        if GatewayOpcodes(dct['op']) == GatewayOpcodes.HELLO:
-                            if self.heartbeat_future is not None:
-                                if not self.heartbeat_future.cancelled():
-                                    self.heartbeat_future.cancel()
-                                    self.heartbeat_future = None
-                            self.heartbeat_interval = dct['d']['heartbeat_interval']
-                            self._trace = dct['d']['_trace']
-                            self.s = dct['s']
-                            logger.debug('Ensuring heartbeat!')
-                            await ws.send_json({
-                                "op": 2,  # Identify
-                                "d": {
-                                    "token": self.token,
-                                    "properties": {
-                                        '$os': platform.system(),
-                                        '$browser': 'PyDiscord',
-                                        '$device': 'PyDiscord'
-                                    },
-                                    "compress": False,
-                                    "large_threshold": 250
-                                }
-                            })
-                            self.heartbeat_future = asyncio.ensure_future(
-                                self.send_heartbeat(ws))
-                        elif GatewayOpcodes(dct['op']) == GatewayOpcodes.HEARTBEAT_ACK:
-                            logger.debug("Got heartbeat")
-                            self.s = dct['s']
-                        elif GatewayOpcodes(dct['op']) == GatewayOpcodes.DISPATCH:
-                            event_type = dct['t']
-                            if event_type == 'READY':
-                                self.session_id = dct['d']['session_id']
-                                await self.discord_client.raise_event('on_ready', dct['d'])
-        else:
-            raise WebSocketCreationError()
+        info = await self.request_url('/gateway/bot')
+        self.gateway_url = info['url']
+        self.shards = info['shards']
+        logger.debug(f'I can use {self.shards} shards!')
+        self.heartbeat_interval = None
+        self._trace = None
+        self.s = None
+        self.heartbeat_future = None
+        self.session_id = None
+        async with self.session.ws_connect(self.gateway_url + '?v=6&encoding=json') as ws:
+            async for msg in ws:
+                # logger.debug(msg)
+                if msg.type == aiohttp.WSMsgType.TEXT:
+                    dct = json.loads(msg.data)
+                    opcode = dct['op']
+                    data = dct['d']
+                    if GatewayOpcodes(opcode) == GatewayOpcodes.HELLO:
+                        if self.heartbeat_future is not None:
+                            if not self.heartbeat_future.cancelled():
+                                self.heartbeat_future.cancel()
+                                self.heartbeat_future = None
+                        self.heartbeat_interval = dct['d']['heartbeat_interval']
+                        self._trace = dct['d']['_trace']
+                        self.s = dct['s']
+                        await ws.send_json({
+                            "op": 2,  # Identify
+                            "d": {
+                                "token": self.token,
+                                "properties": {
+                                    '$os': platform.system(),
+                                    '$browser': 'PyDiscord',
+                                    '$device': 'PyDiscord'
+                                },
+                                "compress": False,
+                                "large_threshold": 250
+                            }
+                        })
+                        logger.debug(
+                            f'Ensuring to heartbeat every {self.heartbeat_interval / 1000} seconds!')
+                        self.heartbeat_future = asyncio.ensure_future(
+                            self.send_heartbeat(ws))
+                    elif GatewayOpcodes(opcode) == GatewayOpcodes.HEARTBEAT_ACK:
+                        logger.debug(
+                            f'Got HEARTBEAT_ACK (new s: {dct["s"]}, old s: {self.s})')
+                        self.s = dct['s']
+                    elif GatewayOpcodes(opcode) == GatewayOpcodes.DISPATCH:
+                        event_type = dct['t']
+                        if event_type == 'READY':
+                            self.session_id = data['session_id']
+                            self.discord_client.user = await User.from_api_res(data['user'])
+                            self.discord_client.guilds = await Guild.from_api_res(data['guilds'])
+                            asyncio.ensure_future(
+                                self.discord_client.raise_event('on_ready', dct['d']))
 
     async def send_heartbeat(self, ws):
         while True:
@@ -131,8 +130,8 @@ class HTTPHandler:
                 # logger.debug(await res.text())
                 # logger.debug(res.status)
                 if res.status == 429:
-                    text = await res.text()
-                    limit = RateLimit.from_json(text)
+                    json_res = await res.json()
+                    limit = await RateLimit.from_api_res(json_res)
                     # TODO: Handle global rate limit?
 
                     if 'X-RateLimit-Remaining' in res.headers and int(res.headers['X-RateLimit-Remaining']) > 0:
@@ -145,14 +144,8 @@ class HTTPHandler:
                     await asyncio.sleep(limit.retry_after / 1000)
                     logger.debug("Done waiting! Requesting again")
                 elif res.status < 300 and res.status >= 200:
-                    return res
+                    return await res.json()
                 elif res.status == 401:
-                    logger.warning(
-                        f"You requested a api endpoint which you have no authorization: {text}")
-                    # TODO: Throw error here
-                    return res
+                    raise AuthorizationError
                 else:
-                    # TODO: Throw errors here
-                    logger.warning(
-                        f"Unhandled response status when requesting url = '{url}'")
-                    return res
+                    raise UnhandledEndpointStatusError

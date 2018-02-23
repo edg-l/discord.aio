@@ -1,9 +1,15 @@
-
+import sys
 
 class WebSocketCreationError(Exception):
     def __init__(self):
-        self.message = "Error creating a websocket to connect to discord."
+        print("Error creating a websocket to connect to discord.", file=sys.stderr)
 
-class EventTypeException(Exception):
-    def __init__(self, message):
-        self.message = message
+class EventTypeError(Exception):
+    pass
+
+class AuthorizationError(Exception):
+    def __init__(self):
+        print('You requested a api endpoint which you have no authorization', file=sys.stderr)
+
+class UnhandledEndpointStatusError(Exception):
+    pass

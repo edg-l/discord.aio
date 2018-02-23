@@ -1,37 +1,45 @@
 import json
+import asyncio
+import aiohttp
+
+import logging
+logger = logging.getLogger(__name__)
 
 class DiscordObject:
     """Base class for discord objects."""
 
     @classmethod
-    def from_json(cls, text: str):
-        obj = cls()
-        json_text = json.loads(text)
-        for key, value in json_text.items():
-            setattr(obj, key, value)
-        return obj
+    async def from_api_res(cls, coro_or_json_or_str):
+        """Parses a discord API response"""
+        # TODO: Maybe make this asynchronous, search for async_generator object and how to handle them
 
-    @classmethod
-    def from_json_array(cls, text: str):
-        json_text = json.loads(text)
-        #print(json_text)
-        for jobj in json_text:
-            c = cls()
-            for key, value in jobj.items():
-                setattr(c, key, value)
-            yield c
+        json_obj = coro_or_json_or_str
 
-    @classmethod
-    def from_dict(cls, dct: dict):
-        obj = cls()
-        for key, value in dct.items():
-            setattr(obj, key, value)
-        return obj
-    
-    @classmethod
-    def from_dict_array(cls, lst: list):
-        for x in lst:
-            obj = cls()
-            for key, value in x.items():
-                setattr(obj, key, value)
-            yield obj
+        if isinstance(coro_or_json_or_str, str):
+            json_obj = json.loads(coro_or_json_or_str)
+        elif asyncio.iscoroutine(coro_or_json_or_str):
+            json_obj = await coro_or_json_or_str.json()
+
+        if isinstance(json_obj, list):
+            lst = []
+            for item in json_obj:
+                result = cls()
+                for key, value in item.items():
+                    if hasattr(result, key):
+                        await result._from_api_ext(key, value)
+                lst.append(result)
+            return lst
+        elif isinstance(json_obj, dict):
+            result = cls()
+            for key, value in json_obj.items():
+                if hasattr(result, key):
+                    await result._from_api_ext(key, value)
+            return result
+        else:
+            raise ValueError('it must be a dictionary or a list.')
+
+    async def _from_api_ext(self, key, value):
+        """Api response decoding extensions, called automatically by DiscordObject.from_api_res().
+        Used if the class contains a attribute that it's a class and must be initialized with info,
+        also used if the class contains an array of classes as attribute."""
+        setattr(self, key, value)

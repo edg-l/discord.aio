@@ -1,16 +1,13 @@
-import logging
 import json
 
 from .base import DiscordObject
 from .user import User
 from .emoji import Emoji
-from .internal_util import get_class_list
 from .constants import DISCORD_CDN
+from .channel import Channel
 
-FORMAT = '%(asctime)-15s: %(message)s'
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger('DiscordClient')
-
+import logging
+logger = logging.getLogger(__name__)
 
 class Role(DiscordObject):
     def __init__(self, id=0, name="", color=0, hoist=False, position=0,
@@ -23,6 +20,12 @@ class Role(DiscordObject):
         self.permissions = permissions
         self.managed = managed
         self.mentionable = mentionable
+    
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return f'{self.name}#{self.id}'
 
 
 class GuildEmbed(DiscordObject):
@@ -42,16 +45,6 @@ class GuildMember(DiscordObject):
         self.joined_at = joined_at
         self.deaf = deaf
         self.mute = mute
-
-    @classmethod
-    def from_dict(cls, dct: dict):
-        obj = cls()
-        for key, value in dct.items():
-            if key == 'user':
-                setattr(obj, key, User.from_dict(value))
-            else:
-                setattr(obj, key, value)
-        return obj
 
 
 class Guild(DiscordObject):
@@ -97,53 +90,38 @@ class Guild(DiscordObject):
         self.channels = channels
         self.presences = presences
 
-    @classmethod
-    def from_json(cls, text: str):
-        obj = cls()
-        json_text = json.loads(text)
-        for key, value in json_text.items():
-            if key == 'roles':
-                setattr(obj, key, get_class_list(Role, value))
-            elif key == 'members':
-                setattr(obj, key, get_class_list(GuildMember, value))
-            elif key == 'emojis':
-                setattr(obj, key, get_class_list(Emoji, value))
-            else:
-                setattr(obj, key, value)
-        return obj
+    async def _from_api_ext(self, key, value):
+        if key == 'roles':
+            #setattr(self, key, get_class_list(Role, value))
+            setattr(self, key, [await Role.from_api_res(x) for x in value])
+            pass
+        elif key == 'members':
+            # logger.debug([GuildMember.from_api_res(x) async for x in value])
+            setattr(self, key, [await GuildMember.from_api_res(x) for x in value])
+            pass
+        elif key == 'emojis':
+            #setattr(self, key, get_class_list(Emoji, value))
+            pass
+        elif key == 'channels':
+            #setattr(self, key, get_class_list(Channel, value))
+            pass
+        else:
+            await super()._from_api_ext(key, value)
 
-    @classmethod
-    def from_json_array(cls, text: str):
-        objs = []
-        json_text = json.loads(text)
-        # print(json_text)
-        for jobj in json_text:
-            c = cls()
-            for key, value in jobj.items():
-
-                if key == 'roles':
-                    setattr(c, key, get_class_list(Role, value))
-                elif key == 'members':
-                    setattr(c, key, get_class_list(GuildMember, value))
-                else:
-                    setattr(c, key, value)
-            objs.append(c)
-        return objs
-
-    def _fill_members(self, json_text):
-        members = json.loads(json_text)
+    async def _fill_members(self, members: list):
         self.members = []
         for member in members:
-            self.members.append(GuildMember.from_dict(member))
+            self.members.append(await GuildMember.from_api_res(member))
 
     def is_owner(self, member: GuildMember):
         return self.owner_id == member.user.id
-    
+
     def get_icon(self):
         return DISCORD_CDN + f'/icons/{self.id}/{self.icon}.png'
-    
+
     def get_splash(self):
         return DISCORD_CDN + f'/splashes/{self.id}/{self.splash}.png'
+
 
 class Integration(DiscordObject):
     def __init__(self, id=0, name="", type="", enabled=False, syncing=False,

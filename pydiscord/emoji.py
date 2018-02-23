@@ -1,7 +1,6 @@
 import json
 
 from .base import DiscordObject
-from .internal_util import get_class_list
 from .user import User
 from .constants import DISCORD_CDN
 
@@ -16,17 +15,10 @@ class Emoji(DiscordObject):
         self.require_colons = require_colons
         self.managed = managed
         self.animated = animated
-
-    @classmethod
-    def from_json(cls, text: str):
-        obj = cls()
-        json_text = json.loads(text)
-        for key, value in json_text.items():
-            if key == 'user':
-                setattr(obj, key, User.from_dict(value))
-            else:
-                setattr(obj, key, value)
-        return obj
+    
+    async def _from_api_ext(self, key, value):
+        if key == 'user':
+            setattr(self, key, User.from_api_res(value, True))
     
     def get_url(self):
         return DISCORD_CDN + f'/emojis/{self.id}.png'

@@ -1,6 +1,5 @@
 from .base import DiscordObject
 from .user import User
-from .internal_util import get_class_list
 
 
 class Channel(DiscordObject):
@@ -28,26 +27,6 @@ class Channel(DiscordObject):
         self.parent_id = parent_id
         self.last_pin_timestamp = last_pin_timestamp
 
-    @classmethod
-    def from_dict(cls, dct: dict):
-        obj = cls()
-        for key, value in dct.items():
-            if key == 'recipients':
-                setattr(obj, key, get_class_list(User, value))
-            else:
-                setattr(obj, key, value)
-        return obj
-    
-    @classmethod
-    def from_dict_array(cls, lst: list):
-        for channel in lst:
-            obj = cls()
-            for key, value in channel.items():
-                if key == 'recipients':
-                    setattr(obj, key, get_class_list(User, value))
-                else:
-                    setattr(obj, key, value)
-            yield obj
 
 class MessageActivity(DiscordObject):
     def __init__(self, type=None, party_id=""):

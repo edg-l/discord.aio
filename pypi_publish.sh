@@ -16,5 +16,5 @@ python3 setup.py bdist
 # Sign
 gpg --detach-sign -a dist/*.tar.gz
 
-#Upload
+# Upload
 twine upload dist/*

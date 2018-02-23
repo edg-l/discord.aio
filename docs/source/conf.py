@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.abspath('../'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'pydiscord'
+project = 'PyDiscord'
 copyright = '2018, Ryozuki'
 author = 'Ryozuki'
 
@@ -147,7 +147,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'pydiscord.tex', 'pydiscord Documentation',
-     'Edgar Luque', 'manual'),
+     'Ryozuki', 'manual'),
 ]
 
 

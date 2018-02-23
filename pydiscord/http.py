@@ -4,6 +4,8 @@ import json
 import time
 import logging
 import threading
+import platform
+from concurrent.futures import ProcessPoolExecutor
 
 from .user import User, UserConnection
 from .guild import Guild, GuildMember
@@ -12,6 +14,7 @@ from .version import PYDISCORD_VERSION_STR
 from .constants import DISCORD_API_URL
 from .channel import Channel
 from .exceptions import WebSocketCreationError
+from .enums import GatewayOpcodes
 
 FORMAT = '%(asctime)-15s: %(message)s'
 logging.basicConfig(level=logging.DEBUG)
@@ -26,15 +29,17 @@ class RateLimit(DiscordObject):
 
 
 class HTTPHandler:
-    def __init__(self, token):
+    def __init__(self, token, discord_client):
         self.token = token
         self.loop = asyncio.get_event_loop()
         self.headers = ''
         self.update_headers()
         self.session = None
+        self.executor = ProcessPoolExecutor(2)
+        self.discord_client = discord_client
 
     async def create_session(self):
-        self.session = aiohttp.ClientSession(headers=self.headers)
+        self.session = aiohttp.ClientSession(headers=self.headers, auto_decompress=True)
 
     async def close_session(self):
         await self.session.close()
@@ -48,14 +53,64 @@ class HTTPHandler:
         res = await self.request_url('/gateway/bot')
         if res.status == 200:
             info = await res.json()
-            gateway_url = info['url']
-            # shards = info['shards']
-            async with self.session.ws_connect(gateway_url + '?v=6&encoding=json') as ws:
+            self.gateway_url = info['url']
+            self.shards = info['shards']
+            logger.debug(f'I can use {self.shards} shards!')
+            self.heartbeat_interval = None
+            self._trace = None
+            self.s = None
+            self.heartbeat_future = None
+            self.session_id = None
+            async with self.session.ws_connect(self.gateway_url + '?v=6&encoding=json') as ws:
                 async for msg in ws:
+                    # logger.debug(msg)
                     if msg.type == aiohttp.WSMsgType.TEXT:
-                        logger.debug(msg.data)
+                        dct = json.loads(msg.data)
+                        if GatewayOpcodes(dct['op']) == GatewayOpcodes.HELLO:
+                            if self.heartbeat_future is not None:
+                                if not self.heartbeat_future.cancelled():
+                                    self.heartbeat_future.cancel()
+                                    self.heartbeat_future = None
+                            self.heartbeat_interval = dct['d']['heartbeat_interval']
+                            self._trace = dct['d']['_trace']
+                            self.s = dct['s']
+                            logger.debug('Ensuring heartbeat!')
+                            await ws.send_json({
+                                "op": 2,  # Identify
+                                "d": {
+                                    "token": self.token,
+                                    "properties": {
+                                        '$os': platform.system(),
+                                        '$browser': 'PyDiscord',
+                                        '$device': 'PyDiscord'
+                                    },
+                                    "compress": False,
+                                    "large_threshold": 250
+                                }
+                            })
+                            self.heartbeat_future = asyncio.ensure_future(
+                                self.send_heartbeat(ws))
+                        elif GatewayOpcodes(dct['op']) == GatewayOpcodes.HEARTBEAT_ACK:
+                            logger.debug("Got heartbeat")
+                            self.s = dct['s']
+                        elif GatewayOpcodes(dct['op']) == GatewayOpcodes.DISPATCH:
+                            event_type = dct['t']
+                            if event_type == 'READY':
+                                self.session_id = dct['d']['session_id']
+                                await self.discord_client.raise_event('on_ready', dct['d'])
         else:
             raise WebSocketCreationError()
+
+    async def send_heartbeat(self, ws):
+        while True:
+            logger.debug(
+                f'Waiting {self.heartbeat_interval / 1000} seconds to send heartbeat')
+            await asyncio.sleep(self.heartbeat_interval / 1000)
+            await ws.send_json({
+                'op': 1,
+                'd': self.s
+            })
+            logger.debug("Sent heartbeat")
 
     def update_headers(self):
         self.headers = {'Authorization': 'Bot ' + self.token,

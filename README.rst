@@ -1,4 +1,4 @@
-pydiscord
+PyDiscord
 =========
 .. image:: https://readthedocs.org/projects/pydiscord/badge/?version=latest
   :target: http://pydiscord.readthedocs.io/en/latest/?badge=latest
@@ -18,3 +18,9 @@ Building the documentation
 - :bash:`sudo apt install python3-sphinx`
 - :bash:`pip3 install sphinx_rtd_theme recommonmark`
 - :bash:`cd docs/ && make html`
+
+TODO
+----
+- `Add compression support <https://discordapp.com/developers/docs/topics/gateway#encoding-and-compression/>`_
+- `Add bot shards support <https://discordapp.com/developers/docs/topics/gateway#get-gateway-bot/>`_
+- Handle all discord events

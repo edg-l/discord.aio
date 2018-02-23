@@ -1,8 +1,16 @@
 from setuptools import setup
 
+try:
+    from pypandoc import convert
+    read_md = lambda f: convert(f, 'rst', 'md')
+except ImportError:
+    print("warning: pypandoc module not found, could not convert Markdown to RST")
+    read_md = lambda f: open(f, 'r').read()
+
 setup(name='discord.aio',
-      version='0.1.3',
+      version='0.1.4',
       description='discord.aio is a asynchronous Discord API wrapper for asyncio and python',
+      long_description=read_md('README.md'),
       url='https://github.com/Ryozuki/discord.aio',
       author='Ryozuki',
       author_email='contact@ryobyte.com',
@@ -27,7 +35,7 @@ setup(name='discord.aio',
 
           # Indicate who your project is intended for
           'Intended Audience :: Developers',
-          'Software Development :: Libraries :: Python Modules',
+          'Topic :: Software Development :: Libraries :: Python Modules',
 
           # Pick your license as you wish (should match "license" above)
           'License :: OSI Approved :: MIT License',

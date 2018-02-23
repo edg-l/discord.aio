@@ -15,6 +15,6 @@ from .user import User, UserConnection
 from .guild import Guild, GuildEmbed, GuildMember, Integration, IntegrationAccount
 from .invite import Invite, InviteMetadata
 from .enums import ChannelTypes, ExplicitContentFilterLevel, MessageActivityTypes, MessageNotificationLevel, MFALevel, VerificationLevel
-from .version import PYDISCORD_VERSION_MAJOR, PYDISCORD_VERSION_MINOR, PYDISCORD_VERSION_REVISION, PYDISCORD_VERSION_STR
+from .version import PYDISCORD_VERSION_STR
 from .exceptions import WebSocketCreationError, AuthorizationError, EventTypeError, UnhandledEndpointStatusError
 from .base import DiscordObject

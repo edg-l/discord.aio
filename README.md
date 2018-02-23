@@ -1,4 +1,6 @@
 # discord.aio
+[![PyPI version](https://badge.fury.io/py/discord.aio.svg)](https://badge.fury.io/py/discord.aio)
+[![GitHub version](https://badge.fury.io/gh/Ryozuki%2Fdiscord.aio.svg)](https://badge.fury.io/gh/Ryozuki%2Fdiscord.aio)
 
 > discord.aio is an asynchronous Discord API wrapper
 

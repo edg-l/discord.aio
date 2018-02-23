@@ -2,12 +2,12 @@ from setuptools import setup
 
 try:
     import pypandoc
-    long_description = pypandoc.convert('README.md', 'rst')
+    long_description = pypandoc.convert_file('README.md', 'rst')
 except(IOError, ImportError):
     long_description = open('README.md').read()
 
 setup(name='discord.aio',
-      version='0.1.5.1',
+      version='0.1.5.2',
       description='discord.aio is a asynchronous Discord API wrapper for asyncio and python',
       long_description=long_description,
       url='https://github.com/Ryozuki/discord.aio',

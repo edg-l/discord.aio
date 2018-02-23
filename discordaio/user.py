@@ -32,10 +32,10 @@ class User(DiscordObject):
         self.email = email
 
     def __str__(self):
-        return "{0}#{1}".format(self.username, self.discriminator)
+        return f'{self.username}#{self.discriminator}'
 
     def __repr__(self):
-        return "({0}#{1}, {2})".format(self.username, self.discriminator, self.id)
+        return f'<User Object: {self.username}#{self.discriminator}, {self.id}>'
     
     def get_avatar_url(self):
         return DISCORD_CDN + f'/avatars/{self.id}/{self.avatar}.png'

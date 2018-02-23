@@ -8,7 +8,7 @@ except(IOError, ImportError):
 
 setup(name='discord.aio',
       version='0.1.5.2',
-      description='discord.aio is a asynchronous Discord API wrapper for asyncio and python',
+      description='discord.aio is an asynchronous Discord API wrapper for asyncio and python',
       long_description=long_description,
       url='https://github.com/Ryozuki/discord.aio',
       download_url='https://github.com/Ryozuki/discord.aio/archive/0.1.4.tar.gz',

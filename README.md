@@ -7,6 +7,14 @@
 ## Documentation
 You can find the module documentation here: https://ryozuki.github.io/discord.aio/docs
 
+## Installation
+
+### With pip:
+- `pip3 install discord.aio`
+
+### From source:
+- `git clone https://github.com/Ryozuki/discord.aio && cd discord.aio && pip3 install .`
+
 ## Local development
 - `git clone https://github.com/Ryozuki/discord.aio`
 - `cd discord.aio && pip3 install -e .`

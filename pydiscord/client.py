@@ -3,9 +3,11 @@ import asyncio
 import json
 import time
 import logging
+import signal
 from concurrent.futures import ProcessPoolExecutor
 from threading import Thread
 
+from .exceptions import EventTypeException
 from .user import User, UserConnection
 from .guild import Guild, GuildMember
 from .base import DiscordObject
@@ -14,9 +16,13 @@ from .constants import DISCORD_API_URL
 from .channel import Channel
 from .http import HTTPHandler
 
-FORMAT = '%(asctime)-15s: %(message)s'
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('DiscordClient')
+
+
+def task_handler():
+    logger.debug('Stopping tasks')
+    for task in asyncio.Task.all_tasks():
+        task.cancel()
 
 
 class DiscordBot:
@@ -27,9 +33,10 @@ class DiscordBot:
             token (str): The bot discord token.
         """
         self.token = token
-        self.httpHandler = HTTPHandler(token)
+        self.httpHandler = HTTPHandler(token, self)
         self.loop = asyncio.get_event_loop()
         self.do_sync = self.loop.run_until_complete
+        self.loop.add_signal_handler(signal.SIGINT, task_handler)
 
     def run(self):
         try:
@@ -37,21 +44,52 @@ class DiscordBot:
         except KeyboardInterrupt:
             # TODO: Add bot close code here
             pass
+        except asyncio.CancelledError:
+            logger.debug('Tasks has been cancelled')
         finally:
             self.do_sync(self.httpHandler.close_session())
             self.loop.close()
+
+    async def raise_event(self, event, *args, **kwargs):
+        try:
+            await getattr(self, event)(*args, **kwargs)
+        except asyncio.CancelledError:
+            pass
+        except Exception:
+            # TODO: handle error here
+            pass
+
+    def event(self, name=None):
+        """DiscordBot event decorator, uses the function's name or the 'name' parameter to subscribe to a event"""
+        def real_event(coro):
+            if not asyncio.iscoroutinefunction(coro):
+                raise EventTypeException(
+                    'The event function must be a coroutine.')
+            if name is not None:
+                if not isinstance(name, str):
+                    raise TypeError('event name must be of type str')
+                else:
+                    try:
+                        getattr(self, name)
+                        raise AttributeError(
+                            'tried to subscribe to a event that doesn\'t exist')
+                    except AttributeError:
+                        pass
+                    finally:
+                        setattr(self, name, coro)
+            else:
+                setattr(self, coro.__name__, coro)
+            logger.debug(f'{coro.__name__} subscribed succesfully.')
+            return coro
+        return real_event
 
     async def start(self):
         await self.httpHandler.create_session()
         await self.httpHandler.start_websocket()
 
-    async def event(self, func):
-        if func.__name__ == 'on_message':
-            pass
-        pass
-
     async def change_avatar(self, url):
-        pass  # TODO: Implement this: https://discordapp.com/developers/docs/resources/user#modify-current-user
+        raise NotImplementedError()
+        # TODO: Implement this: https://discordapp.com/developers/docs/resources/user#modify-current-user
 
     async def get_user(self, id) -> User:
         """Request a user information.

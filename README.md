@@ -53,7 +53,7 @@ if __name__ == '__main__':
         logger.info(f'{message.author}: {message.content}')
 ```
 
-[Here](https://github.com/Ryozuki/discord.aio/blob/master/test/bot.py) you can find a more extensive example.
+[Here](https://github.com/Ryozuki/discord.aio/blob/master/examples/bot.py) you can find a more extensive example.
 
 You can also check the [documentation](https://ryozuki.github.io/discord.aio/docs) for detailed explanation on how the module works.
 

@@ -3,6 +3,7 @@
 [![Python version](https://img.shields.io/pypi/pyversions/discord.aio.svg)](https://github.com/Ryozuki/discord.aio)
 [![Module status](https://img.shields.io/pypi/status/discord.aio.svg)](https://github.com/Ryozuki/discord.aio)
 [![License](https://img.shields.io/pypi/l/discord.aio.svg)](https://github.com/Ryozuki/discord.aio/blob/master/LICENSE.txt)
+[![Discord](https://img.shields.io/discord/416878158436892672.svg)](https://discord.gg/hJ7ewAT)
 
 > discord.aio is an asynchronous Discord API wrapper
 

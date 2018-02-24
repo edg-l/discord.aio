@@ -31,7 +31,7 @@ Event Parameters:
 ```python
 @bot.event()
 async def on_guild_create(guild_index):
-    print(f'I\'m connected to {bot.guilds[i].name} guild, it got {len(bot.guilds[i].channels)} channels.')
+    print(f'I\'m connected to {bot.guilds[guild_index].name} guild, it got {len(bot.guilds[guild_index].channels)} channels.')
 ```
 
 ### Event: on_typing_start
@@ -46,7 +46,7 @@ Event Parameters:
 ```python
 @bot.event()
 async def on_typing_start(user_id, channel_id, timestamp):
-    print(f'I\'m connected to {bot.guilds[i].name} guild, it got {len(bot.guilds[i].channels)} channels.')
+    print(f'User with id {user_id} started typing!')
 ```
 
 ### Event: on_message

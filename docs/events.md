@@ -1,4 +1,4 @@
-<[Go to homepage](https://ryozuki.github.io/discord.aio/docs)>
+\<[Go to homepage](https://ryozuki.github.io/discord.aio/docs)>
 
 ## Events
 - [on_ready](#event-on_ready)
@@ -138,7 +138,7 @@ Raised when:
 
 Event Parameters:
 - `guild_id`    (**int**): The guild id.
-- `roles`       (**list<int>**): User role ids.
+- `roles`       (**list\<int>**): User role ids.
 - `user`        (**User**): The user.
 - `nick`        (**str**): Nickname of the user in the guild.
 
@@ -148,7 +148,7 @@ Raised when:
 
 Event Parameters:
 - `guild_id`    (**int**): The guild id.
-- `members`       (**list<GuildMember>**): Set of guild members
+- `members`       (**list\<GuildMember>**): Set of guild members
 
 ### Event: on_ban
 Raised when:

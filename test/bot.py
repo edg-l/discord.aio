@@ -19,14 +19,16 @@ if __name__ == '__main__':
         logger.info(f'My username is {bot.user}')
     
     @bot.event()
-    async def on_guild_create(guild_index):
-        logger.info(f'I\'m connected to {bot.guilds[guild_index].name} guild, it got {len(bot.guilds[guild_index].channels)} channels.')
+    async def on_guild_create(guild):
+        logger.info(f'I\'m connected to {guild.name} guild, it got {len(guild.channels)} channels.')
     
     @bot.event()
     async def on_message(message):
         logger.info(f'{message.author}: {message.content}')
-
+    
     @bot.event()
-    async def on_typing_start(user_id, channel_id, timestamp):
-        logger.info(f'User with id {user_id} started typing!')
+    async def on_message_reaction_add(user_id, channel_id, message_id, emoji):
+        user = await bot.get_user(user_id)
+        logger.info(f'{user} reacted to a message with {emoji.name}')
+
     bot.run()

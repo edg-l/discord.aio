@@ -1,13 +1,25 @@
 from setuptools import setup
 
-try:
-    import pypandoc
-    long_description = pypandoc.convert_file('README.md', 'rst')
-except(IOError, ImportError):
-    long_description = open('README.md').read()
+long_description = open('README.rst').read()
+
+
+def find_version(filename):
+    """
+    Find package version in file.
+    """
+    import re
+    import os
+    here = os.path.dirname(os.path.abspath(__file__))
+    content = open(os.path.join(here, filename)).read()
+    version_match = re.search(
+        r"^__version__ = ['\"]([^'\"]*)['\"]", content, re.M
+    )
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError('Unable to find version string.')
 
 setup(name='discord.aio',
-      version='0.1.8',
+      version=find_version('discordaio/version.py'),
       description='discord.aio is an asynchronous Discord API wrapper for asyncio and python',
       long_description=long_description,
       url='https://github.com/Ryozuki/discord.aio',

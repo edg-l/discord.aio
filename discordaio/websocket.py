@@ -4,11 +4,14 @@ import json
 import platform
 
 from .enums import GatewayOpcodes
-from .guild import Guild
+from .guild import Guild, GuildMember
 from .user import User
 from .http import HTTPHandler
+from .role import Role
 from .channel import Channel, ChannelMessage
 from .emoji import Emoji
+from .activity import Activity
+from .voice import VoiceState
 
 import logging
 logger = logging.getLogger(__name__)
@@ -123,17 +126,23 @@ class DiscordWebsocket:
             self.http.get_client().user = await User.from_api_res(data['user'])
             self.http.get_client().guilds = await Guild.from_api_res(data['guilds'])
             return await self.http.get_client().raise_event('on_ready')
+        
+        elif event == 'RESUMED':
+            return await self.http.get_client().raise_event('on_resumed')
+        
+        elif event == 'INVALID_SESSION':
+            return await self.http.get_client().raise_event('on_invalid_session', data)
 
         elif event == 'CHANNEL_CREATE':
             return await self.http.get_client().raise_event('on_channel_create', await Channel.from_api_res(data))
 
         elif event == 'CHANNEL_UPDATE':
             return await self.http.get_client().raise_event('on_channel_update', await Channel.from_api_res(data))
-        
+
         elif event == 'CHANNEL_DELETE':
             return await self.http.get_client().raise_event('on_channel_delete', await Channel.from_api_res(data))
-        
-        elif event == 'CHANNEL_PINS_UPDATE:
+
+        elif event == 'CHANNEL_PINS_UPDATE':
             return await self.http.get_client().raise_event('on_channel_pin', data['channel_id'], data['last_pin_timestamp'])
 
         elif event == 'GUILD_CREATE':
@@ -152,8 +161,42 @@ class DiscordWebsocket:
             guild_id = data['guild_id']
             return await self.http.get_client().raise_event('on_ban_remove', guild_id, await User.from_api_res(data))
 
-        elif event == 'TYPING_START':
-            await self.http.get_client().raise_event('on_typing_start', data['user_id'], data['channel_id'], data['timestamp'])
+        elif event == 'GUILD_EMOJIS_UPDATE':
+            guild_id = data['guild_id']
+            return await self.http.get_client().raise_event('on_guild_emojis_update', guild_id, await Emoji.from_api_res(data['emojis']))
+
+        elif event == 'GUILD_INTEGRATIONS_UPDATE':
+            guild_id = data['guild_id']
+            return await self.http.get_client().raise_event('on_guild_integrations_update', guild_id)
+
+        elif event == 'GUILD_MEMBER_ADD':
+            guild_id = data['guild_id']
+            return await self.http.get_client().raise_event('on_guild_member_add', guild_id, await GuildMember.from_api_res(data))
+
+        elif event == 'GUILD_MEMBER_REMOVE':
+            guild_id = data['guild_id']
+            return await self.http.get_client().raise_event('on_guild_member_remove', guild_id, await User.from_api_res(data['user']))
+
+        elif event == 'GUILD_MEMBER_UPDATE':
+            guild_id = data['guild_id']
+            return await self.http.get_client().raise_event('on_guild_member_update', guild_id,
+                                                            await Role.from_api_res(data['roles']), await User.from_api_res(data['user']), data['nick'])
+
+        elif event == 'GUILD_MEMBERS_CHUNK':
+            guild_id = data['guild_id']
+            return await self.http.get_client().raise_event('on_guild_members_chunk', guild_id, await GuildMember.from_api_res(data['members']))
+
+        elif event == 'GUILD_ROLE_CREATE':
+            guild_id = data['guild_id']
+            return await self.http.get_client().raise_event('on_guild_role_create', guild_id, await Role.from_api_res(data['role']))
+
+        elif event == 'GUILD_ROLE_UPDATE':
+            guild_id = data['guild_id']
+            return await self.http.get_client().raise_event('on_guild_role_update', guild_id, await Role.from_api_res(data['role']))
+
+        elif event == 'GUILD_ROLE_DELETE':
+            guild_id = data['guild_id']
+            return await self.http.get_client().raise_event('on_guild_role_delete', guild_id, data['role_id'])
 
         elif event == 'MESSAGE_CREATE':
             message = await ChannelMessage.from_api_res(data)
@@ -182,6 +225,26 @@ class DiscordWebsocket:
         elif event == 'MESSAGE_REACTION_REMOVE_ALL':
             await self.http.get_client().raise_event(
                 'on_message_reaction_remove_all', data['channel_id'], data['message_id'])
+
+        elif event == 'PRESENCE_UPDATE':
+            await self.http.get_client().raise_event('on_presence_update', await User.from_api_res(data['user']),
+                                                     data['roles'], await Activity.from_api_res(data.get('game')), data['guild_id'],
+                                                     data['status'])
+
+        elif event == 'TYPING_START':
+            await self.http.get_client().raise_event('on_typing_start', data['user_id'], data['channel_id'], data['timestamp'])
+        
+        elif event == 'USER_UPDATE':
+            await self.http.get_client().raise_event('on_user_update', await User.from_api_res(data))
+        
+        elif event == 'VOICE_STATE_UPDATE':
+            await self.http.get_client().raise_event('on_voice_state_update', await VoiceState.from_api_res(data))
+
+        elif event == 'VOICE_SERVER_UPDATE':
+            await self.http.get_client().raise_event('on_voice_server_update', data['token'], data['guild_id'], data['endpoint'])
+        
+        elif event == 'WEBHOOKS_UPDATE':
+            await self.http.get_client().raise_event('on_webhooks_update', data['guild_id'], data['channel_id'])
 
         else:
             logger.critical(

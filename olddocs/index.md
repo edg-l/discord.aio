@@ -5,7 +5,7 @@ The project is under early development, so the documentation is heavily incomple
 - [List of all events](https://ryozuki.github.io/discord.aio/docs/events)
 
 ## Module classes
-- discordaio.DiscordBot
+- Bot methods: [discordaio.DiscordBot](https://ryozuki.github.io/discord.aio/docs/discordbot)
 - discordaio.Channel
 - discordaio.ChannelMessage
 - TODO: Add this doc

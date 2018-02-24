@@ -71,8 +71,8 @@ class HTTPHandler:
                                 "token": self.token,
                                 "properties": {
                                     '$os': platform.system(),
-                                    '$browser': 'PyDiscord',
-                                    '$device': 'PyDiscord'
+                                    '$browser': 'discord.aio',
+                                    '$device': 'discord.aio'
                                 },
                                 "compress": False,
                                 "large_threshold": 250

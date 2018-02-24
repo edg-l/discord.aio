@@ -122,8 +122,19 @@ class DiscordWebsocket:
             self.session_id = data['session_id']
             self.http.get_client().user = await User.from_api_res(data['user'])
             self.http.get_client().guilds = await Guild.from_api_res(data['guilds'])
-            asyncio.ensure_future(
-                self.http.get_client().raise_event('on_ready'))
+            return await self.http.get_client().raise_event('on_ready')
+
+        elif event == 'CHANNEL_CREATE':
+            return await self.http.get_client().raise_event('on_channel_create', await Channel.from_api_res(data))
+
+        elif event == 'CHANNEL_UPDATE':
+            return await self.http.get_client().raise_event('on_channel_update', await Channel.from_api_res(data))
+        
+        elif event == 'CHANNEL_DELETE':
+            return await self.http.get_client().raise_event('on_channel_delete', await Channel.from_api_res(data))
+        
+        elif event == 'CHANNEL_PINS_UPDATE:
+            return await self.http.get_client().raise_event('on_channel_pin', data['channel_id'], data['last_pin_timestamp'])
 
         elif event == 'GUILD_CREATE':
             guild = await Guild.from_api_res(data)

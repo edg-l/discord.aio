@@ -2,6 +2,9 @@
 
 ## Events
 - [on_ready](#event-on_ready)
+- [on_channel_create](#event-on_channel_create)
+- [on_channel_update](#event-on_channel_update)
+- [on_channel_delete](#event-on_channel_delete)
 - [on_guild_create](#event-on_guild_create)
 - [on_guild_delete](#event-on_guild_delete)
 - [on_ban](#event-on_ban)
@@ -24,6 +27,37 @@ async def on_ready():
     print('Connected!')
     print(f'My username is {bot.user}')
 ```
+
+### Event: on_channel_create
+Raised when:
+- A new channel is created
+
+Event Parameters:
+- `channel`: The created channel
+
+### Event: on_channel_update
+Raised when:
+- A channel is updated
+
+Event Parameters:
+- `channel`: The updated channel
+
+### Event: on_channel_delete
+Raised when:
+- A channel is deleted
+
+Event Parameters:
+- `channel`: The deleted channel
+
+### Event: on_channel_pin
+Raised when:
+- A message is pinned or unpinned in a text channel.
+
+*Note: This is not raised when a pinned message is deleted.*
+
+Event Parameters:
+- `channel_id`: The id of the channel
+- `last_pin_timestamp`: The time at which the most recent pinned message was pinned
 
 ### Event: on_guild_create
 Raised when:

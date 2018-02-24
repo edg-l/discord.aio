@@ -12,6 +12,7 @@ from .base import DiscordObject
 from .constants import DISCORD_API_URL
 from .channel import Channel
 from .http import HTTPHandler
+from .websocket import DiscordWebsocket
 
 import logging
 logger = logging.getLogger(__name__)
@@ -30,13 +31,14 @@ class DiscordBot:
         Args:
             token (str): The bot discord token.
         """
-        self.token = token
-        self.httpHandler = HTTPHandler(token, self)
+        self.token: str = token
+        self.http: HTTPHandler = HTTPHandler(token, self)
         self.guilds = []
         self.loop = asyncio.get_event_loop()
         self.do_sync = self.loop.run_until_complete
         self.loop.add_signal_handler(signal.SIGINT, task_handler)
-        self.user = User()
+        self.user: User = User()
+        self.ws: DiscordWebsocket = None
 
     def run(self):
         try:
@@ -47,10 +49,10 @@ class DiscordBot:
         except asyncio.CancelledError:
             logger.debug('Tasks has been cancelled')
         finally:
-            self.do_sync(self.httpHandler.close_session())
+            self.do_sync(self.http.close_session())
             self.loop.close()
 
-    async def raise_event(self, event, *args, **kwargs):
+    async def raise_event(self, event: str, *args, **kwargs):
         try:
             if hasattr(self, event):
                 await getattr(self, event)(*args, **kwargs)
@@ -62,7 +64,7 @@ class DiscordBot:
             # TODO: handle error here
             pass
 
-    def event(self, name=None):
+    def event(self, name: str=None):
         """DiscordBot event decorator, uses the function's name or the 'name' parameter to subscribe to a event"""
         def real_event(coro):
             if not asyncio.iscoroutinefunction(coro):
@@ -87,79 +89,64 @@ class DiscordBot:
         return real_event
 
     async def start(self):
-        await self.httpHandler.create_session()
-        await self.httpHandler.start_websocket()
+        await self.http.create_session()
+        self.ws = DiscordWebsocket(self.http)
+        await self.ws.start()
     
     async def exit(self):
-        try:
-            task_handler()
-            await self.httpHandler.close_session()
-        except asyncio.CancelledError:
-            pass
+        if not self.ws.closed:
+            await self.ws.close()
+        await self.http.close_session()
+        
 
-    async def change_avatar(self, url):
+    async def change_avatar(self, url: str):
         raise NotImplementedError()
         # TODO: Implement this: https://discordapp.com/developers/docs/resources/user#modify-current-user
 
-    async def get_user(self, id) -> User:
-        """Request a user information.
-
-        Args:
-            id (int): The id of the user.
-        Returns:
-            User: The requested user
-        """
-
-        res = await self.httpHandler.request_url('/users/' + str(id))
+    async def get_user(self, id: int) -> User:
+        res = await self.http.request_url('/users/' + str(id))
         return await User.from_api_res(res)
 
-    async def get_self_user(self):
-        """Requests information about the current user."""
-
+    async def get_self_user(self) -> User:
         return await self.get_user("@me")
 
-    async def get_guilds(self):
-        """Returns the list of guilds that the user belongs to.
-
-        Returns:
-            [Guild]: The array of guilds.
-        """
-        res = await self.httpHandler.request_url('/users/@me/guilds')
+    async def get_guilds(self) -> list:
+        res = await self.http.request_url('/users/@me/guilds')
         return await Guild.from_api_res(res)
 
-    async def get_guild(self, id):
-        res = await self.httpHandler.request_url('/guilds/' + str(id))
+    async def get_guild(self, id) -> Guild:
+        res = await self.http.request_url('/guilds/' + str(id))
         return await Guild.from_api_res(res)
 
     async def get_guild_members(self, guild: Guild):
         """Gets and fills the guild with it's members info"""
 
-        res = await self.httpHandler.request_url('/guilds/' + guild.id + '/members')
+        res = await self.http.request_url('/guilds/' + guild.id + '/members')
         await guild._fill_members(res)
 
-    async def get_guild_member(self, guild: Guild, member_id):
-        res = await self.httpHandler.request_url('/guilds/' + guild.id + '/members/' + member_id)
+    async def get_guild_member(self, guild: Guild, member_id: int):
+        res = await self.http.request_url('/guilds/' + guild.id + '/members/' + member_id)
         return await GuildMember.from_api_res(res)
 
-    async def leave_guild(self, guild_id):
-        await self.httpHandler.request_url(f'/users/@me/guilds/{guild_id}', type='DELETE')
+    async def leave_guild(self, guild_id: int):
+        await self.http.request_url(f'/users/@me/guilds/{guild_id}', type='DELETE')
 
-    async def get_channel(self, channel_id):
-        res = await self.httpHandler.request_url(f'/channels/{channel_id}')
+    async def get_channel(self, channel_id: int):
+        res = await self.http.request_url(f'/channels/{channel_id}')
         return await Channel.from_api_res(res)
 
-    async def delete_channel(self, channel_id):
+    async def delete_channel(self, channel_id: int):
         """Delete a channel, or close a private message. Requires the 'MANAGE_CHANNELS' permission for the guild. 
         Deleting a category does not delete its child channels; they will have their parent_id removed and a Channel Update Gateway event will fire for each of them. 
         Returns a channel object on success. 
         Fires a Channel Delete Gateway event."""
-        res = await self.httpHandler.request_url(f'/channels/{channel_id}', type='DELETE')
+        res = await self.http.request_url(f'/channels/{channel_id}', type='DELETE')
         return await Channel.from_api_res(res)
 
-    async def get_dms(self):
-        res = await self.httpHandler.request_url('/users/@me/channels')
+    async def get_dms(self) -> list:
+        res = await self.http.request_url('/users/@me/channels')
         return await Channel.from_api_res(res)
 
-    async def get_connections(self):
-        res = await self.httpHandler.request_url('/users/@me/connections')
+    async def get_connections(self) -> list:
+        res = await self.http.request_url('/users/@me/connections')
         return await UserConnection.from_api_res(res)

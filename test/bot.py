@@ -15,11 +15,15 @@ if __name__ == '__main__':
 
     @bot.event()
     async def on_ready():
-        logger.info("I got called and im connected :)")
+        logger.info('Connected!')
         logger.info(f'My username is {bot.user}')
     
     @bot.event()
-    async def on_guild_create(i):
-        logger.info(f'I\'m connected to {bot.guilds[i].name} guild, it got {len(bot.guilds[i].channels)} channels.')
+    async def on_guild_create(guild_index):
+        logger.info(f'I\'m connected to {bot.guilds[guild_index].name} guild, it got {len(bot.guilds[guild_index].channels)} channels.')
+    
+    @bot.event()
+    async def on_message(message):
+        logger.info(f'{message.author}: {message.content}')
 
     bot.run()

@@ -1,13 +1,14 @@
 #!/usr/bin/env sh
 
-# Script made to publish the package to https://pypi.org/project/discord.py/
+# Script made to publish the package to https://pypi.python.org/pypi/discord.aio
 
 # Go to script directory
 cd `(dirname $0)`
 
 # Cleanup
 rm -rf dist/
-rm -rf *.aio.egg-info
+rm -rf build/
+rm -rf *.egg-info
 
 # Generate files
 python3 setup.py sdist

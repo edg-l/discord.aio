@@ -7,7 +7,7 @@ import platform
 from .user import User, UserConnection
 from .guild import Guild, GuildMember
 from .base import DiscordObject
-from .version import PYDISCORD_VERSION_STR
+from .version import VERSION_STR
 from .constants import DISCORD_API_URL
 from .channel import Channel, ChannelMessage
 from .exceptions import WebSocketCreationError, AuthorizationError, UnhandledEndpointStatusError
@@ -126,7 +126,7 @@ class HTTPHandler:
 
     def update_headers(self):
         self.headers = {'Authorization': 'Bot ' + self.token,
-                        'User-Agent': f'DiscordBot (https://github.com/Ryozuki/pydiscord, {PYDISCORD_VERSION_STR})'}
+                        'User-Agent': f'DiscordBot (https://github.com/Ryozuki/discord.aio, {VERSION_STR})'}
 
     async def request_url(self, url, type='GET', data=None):
         while True:

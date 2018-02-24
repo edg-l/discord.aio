@@ -9,7 +9,6 @@ from .exceptions import EventTypeError
 from .user import User, UserConnection
 from .guild import Guild, GuildMember
 from .base import DiscordObject
-from .version import PYDISCORD_VERSION_STR
 from .constants import DISCORD_API_URL
 from .channel import Channel
 from .http import HTTPHandler

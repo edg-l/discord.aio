@@ -3,8 +3,8 @@ The project is under early development, so the documentation is heavily incomple
 
 ## Index
 - [Events](#events)
-- - [on_ready](#on_ready)
-- - [on_guild_create](#on_guild_create)
+- - [on_ready](#event-on_ready)
+- - [on_guild_create](#event-on_guild_create)
 
 ## Events
 

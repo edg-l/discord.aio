@@ -13,8 +13,10 @@ from .channel import Channel, ChannelMessage, Attachment, Embed, EmbedAuthor, Em
 from .emoji import Emoji
 from .user import User, UserConnection
 from .guild import Guild, GuildEmbed, GuildMember, Integration, IntegrationAccount
+from .role import Role
 from .invite import Invite, InviteMetadata
 from .enums import ChannelTypes, ExplicitContentFilterLevel, MessageActivityTypes, MessageNotificationLevel, MFALevel, VerificationLevel
 from .version import PYDISCORD_VERSION_STR
 from .exceptions import WebSocketCreationError, AuthorizationError, EventTypeError, UnhandledEndpointStatusError
 from .base import DiscordObject
+from .voice import VoiceRegion, VoiceState

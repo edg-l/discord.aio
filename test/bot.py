@@ -13,15 +13,13 @@ if __name__ == '__main__':
 
     bot = DiscordBot(TOKEN)
 
-    @bot.event('on_ready')
-    async def on_connect():
+    @bot.event()
+    async def on_ready():
         logger.info("I got called and im connected :)")
         logger.info(f'My username is {bot.user}')
-        res = await bot.get_guild(97740313094782976)
-        logger.info(res)
-        #logger.info(res.roles)
-        await bot.get_guild_members(res)
-        print(res.members)
-        print(res.members[0].user.id)
+    
+    @bot.event()
+    async def on_guild_create(i):
+        logger.info(f'I\'m connected to {bot.guilds[i].name} guild, it got {len(bot.guilds[i].channels)} channels.')
 
     bot.run()

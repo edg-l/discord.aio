@@ -2,7 +2,7 @@
 
 from .base import DiscordObject
 from .user import User
-from .guild import Role
+from .role import Role
 from .emoji import Emoji
 
 
@@ -46,6 +46,12 @@ class Channel(DiscordObject):
             setattr(self, key, [await Overwrite.from_api_res(x) for x in value])
         else:
             return await super()._from_api_ext(key, value)
+    
+    def __str__(self):
+        return f'{self.name}#{self.id}'
+
+    def __repr__(self):
+        return f'<Channel Object: {self.name}#{self.id}>'
 
 
 class MessageActivity(DiscordObject):

@@ -4,6 +4,8 @@
 - [on_ready](#event-on_ready)
 - [on_guild_create](#event-on_guild_create)
 - [on_guild_delete](#event-on_guild_delete)
+- [on_ban](#event-on_ban)
+- [on_ban_remove](#event-on_ban_remove)
 - [on_typing_start](#event-on_typing_start)
 - [on_message](#event-on_message)
 - [on_message_update](#event-on_message_update)
@@ -56,6 +58,22 @@ async def on_guild_delete(guild):
     if not guild.unavailable:
         print(f'I got removed from {guild}!')
 ```
+
+### Event: on_ban
+Raised when:
+- A user is banned from a guild
+
+Event Parameters:
+- `guild_id`: The guild id
+- `user`: The banned 
+
+### Event: on_ban_remove
+Raised when:
+- A user is unbanned from a guild
+
+Event Parameters:
+- `guild_id`: The guild id
+- `user`: The unbanned user
 
 ### Event: on_typing_start
 Raised when:

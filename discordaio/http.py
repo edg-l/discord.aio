@@ -52,7 +52,6 @@ class HTTPHandler:
 
     async def request_url(self, url, type='GET', data=None):
         while True:
-            # TODO: Handle aiohttp.client_exceptions.ClientConnectionError: Connection closed
             operation = None
             if type == 'GET':
                 operation = self.session.get(DISCORD_API_URL + url)
@@ -62,11 +61,8 @@ class HTTPHandler:
                 operation = self.session.delete(DISCORD_API_URL + url)
 
             async with operation as res:
-                # logger.debug(await res.text())
-                # logger.debug(res.status)
                 if res.status == 429:
                     limit = await RateLimit.from_api_res(res)
-                    # TODO: Handle global rate limit?
 
                     if 'X-RateLimit-Remaining' in res.headers and int(res.headers['X-RateLimit-Remaining']) > 0:
                         logger.debug(

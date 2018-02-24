@@ -10,6 +10,7 @@ from .base import DiscordObject
 from .version import VERSION_STR
 from .constants import DISCORD_API_URL
 from .channel import Channel, ChannelMessage
+from .emoji import Emoji
 from .exceptions import WebSocketCreationError, AuthorizationError, UnhandledEndpointStatusError
 from .enums import GatewayOpcodes
 
@@ -88,30 +89,77 @@ class HTTPHandler:
                         self.s = dct['s']
                     elif GatewayOpcodes(opcode) == GatewayOpcodes.DISPATCH:
                         event_type = dct['t']
-                        if event_type == 'READY':
-                            self.session_id = data['session_id']
-                            self.discord_client.user = await User.from_api_res(data['user'])
-                            self.discord_client.guilds = await Guild.from_api_res(data['guilds'])
-                            asyncio.ensure_future(
-                                self.discord_client.raise_event('on_ready'))
-                        elif event_type == 'GUILD_CREATE':
-                            guild_id = data['id']
-                            for i, guild in enumerate(self.discord_client.guilds):
-                                if guild.id == guild_id:
-                                    self.discord_client.guilds[i] = await Guild.from_api_res(data)
-                                    asyncio.ensure_future(
-                                        self.discord_client.raise_event('on_guild_create', i))
-                                    break
-                        elif event_type == 'TYPING_START':
-                            asyncio.ensure_future(
-                                self.discord_client.raise_event('on_typing_start', data['user_id'], data['channel_id'], data['timestamp']))
-                        elif event_type == 'MESSAGE_CREATE':
-                            message = await ChannelMessage.from_api_res(data)
-                            asyncio.ensure_future(
-                                self.discord_client.raise_event('on_message', message))
-                        else:
-                            logger.critical(
-                                f'Unhandled event type {event_type}, data: {data}')
+                        asyncio.ensure_future(
+                            self.dispatch_event(event_type, data))
+
+    async def dispatch_event(self, event, data):
+        if event == 'READY':
+            self.session_id = data['session_id']
+            self.discord_client.user = await User.from_api_res(data['user'])
+            self.discord_client.guilds = await Guild.from_api_res(data['guilds'])
+            asyncio.ensure_future(
+                self.discord_client.raise_event('on_ready'))
+
+        elif event == 'GUILD_CREATE':
+            guild_id = data['id']
+
+            for i, guild in enumerate(self.discord_client.guilds):
+                if guild.id == guild_id:
+                    self.discord_client.guilds[i] = await Guild.from_api_res(data)
+                    return await self.discord_client.raise_event('on_guild_create', self.discord_client.guilds[i])
+            
+            logger.debug('(GUILD_CREATE), guild not found in guilds, added to the list.')
+            guild = await Guild.from_api_res(data)
+            self.discord_client.guilds.append(guild)
+            return await self.discord_client.raise_event('on_guild_create', guild)
+        
+        elif event == 'GUILD_DELETE':
+            guild_id = data['id']
+
+            for i, guild in enumerate(self.discord_client.guilds):
+                if guild.id == guild_id:
+                    self.discord_client.guilds[i].unavailable = True
+                    return await self.discord_client.raise_event('on_guild_delete', self.discord_client.guilds[i])
+            
+            logger.debug('(GUILD_DELETE), guild not found in guilds, added to the list.')
+            guild = await Guild.from_api_res(data)
+            self.discord_client.guilds.append(guild)
+            return await self.discord_client.raise_event('on_guild_delete', guild)
+
+        elif event == 'TYPING_START':
+            await self.discord_client.raise_event('on_typing_start', data['user_id'], data['channel_id'], data['timestamp'])
+
+        elif event == 'MESSAGE_CREATE':
+            message = await ChannelMessage.from_api_res(data)
+            await self.discord_client.raise_event('on_message', message)
+
+        elif event == 'MESSAGE_UPDATE':
+            message = await ChannelMessage.from_api_res(data)
+            await self.discord_client.raise_event('on_message_create', message)
+
+        elif event == 'MESSAGE_DELETE':
+            await self.discord_client.raise_event('on_message_delete', data['id'], data['channel_id'])
+
+        elif event == 'MESSAGE_DELETE_BULK':
+            await self.discord_client.raise_event('on_message_delete_bulk', data['ids'], data['channel_id'])
+
+        elif event == 'MESSAGE_REACTION_ADD':
+            emoji = await Emoji.from_api_res(data['emoji'])
+            await self.discord_client.raise_event(
+                'on_message_reaction_add', data['user_id'], data['channel_id'], data['message_id'], emoji)
+
+        elif event == 'MESSAGE_REACTION_REMOVE':
+            emoji = await Emoji.from_api_res(data['emoji'])
+            await self.discord_client.raise_event(
+                'on_message_reaction_remove', data['user_id'], data['channel_id'], data['message_id'], emoji)
+
+        elif event == 'MESSAGE_REACTION_REMOVE_ALL':
+            await self.discord_client.raise_event(
+                'on_message_reaction_remove_all', data['channel_id'], data['message_id'])
+
+        else:
+            logger.critical(
+                f'Unhandled event type {event}, data: {data}')
 
     async def send_heartbeat(self, ws):
         while True:
@@ -143,8 +191,7 @@ class HTTPHandler:
                 # logger.debug(await res.text())
                 # logger.debug(res.status)
                 if res.status == 429:
-                    json_res = await res.json()
-                    limit = await RateLimit.from_api_res(json_res)
+                    limit = await RateLimit.from_api_res(res)
                     # TODO: Handle global rate limit?
 
                     if 'X-RateLimit-Remaining' in res.headers and int(res.headers['X-RateLimit-Remaining']) > 0:

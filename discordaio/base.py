@@ -18,6 +18,8 @@ class DiscordObject:
         if isinstance(coro_or_json_or_str, str):
             json_obj = json.loads(coro_or_json_or_str)
         elif asyncio.iscoroutine(coro_or_json_or_str):
+            json_obj = await coro_or_json_or_str()
+        elif isinstance(coro_or_json_or_str, aiohttp.ClientResponse):
             json_obj = await coro_or_json_or_str.json()
 
         if isinstance(json_obj, list):

@@ -17,17 +17,18 @@ if __name__ == '__main__':
     async def on_ready():
         logger.info('Connected!')
         logger.info(f'My username is {bot.user}')
-    
+
     @bot.event()
     async def on_guild_create(guild):
-        logger.info(f'I\'m connected to {guild.name} guild, it got {len(guild.channels)} channels.')
-    
+        logger.info(
+            f'I\'m connected to {guild.name} guild, it got {len(guild.channels)} channels.')
+
     @bot.event()
     async def on_message(message):
         logger.info(f'{message.author}: {message.content}')
         if message.content.startswith('!exit'):
             await bot.exit()
-    
+
     @bot.event()
     async def on_message_reaction_add(user_id, channel_id, message_id, emoji):
         user = await bot.get_user(user_id)

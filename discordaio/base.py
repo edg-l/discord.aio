@@ -11,7 +11,9 @@ class DiscordObject:
     @classmethod
     async def from_api_res(cls, coro_or_json_or_str):
         """Parses a discord API response"""
-        # TODO: Maybe make this asynchronous, search for async_generator object and how to handle them
+
+        if coro_or_json_or_str is None:
+            return None
 
         json_obj = coro_or_json_or_str
 

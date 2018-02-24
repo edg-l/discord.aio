@@ -7,6 +7,12 @@
 - [on_channel_delete](#event-on_channel_delete)
 - [on_guild_create](#event-on_guild_create)
 - [on_guild_delete](#event-on_guild_delete)
+- [on_guild_emojis_update](#event-on_guild_emojis_update)
+- [on_guild_integrations_update](#event-on_guild_integrations_update)
+- [on_guild_member_add](#event-on_guild_member_add)
+- [on_guild_member_remove](#event-on_guild_member_remove)
+- [on_guild_member_update](#event-on_guild_member_update)
+- [on_guild_members_chunk](#event-on_guild_members_chunk)
 - [on_ban](#event-on_ban)
 - [on_ban_remove](#event-on_ban_remove)
 - [on_typing_start](#event-on_typing_start)
@@ -21,6 +27,8 @@
 Raised when:
 - The client is ready and connected.
 
+*Note: Before this event is raised, DiscordBot.user is filled with information.*
+
 ```python
 @bot.event()
 async def on_ready():
@@ -33,21 +41,21 @@ Raised when:
 - A new channel is created
 
 Event Parameters:
-- `channel`: The created channel
+- `channel`     (**Channel**): The created channel
 
 ### Event: on_channel_update
 Raised when:
 - A channel is updated
 
 Event Parameters:
-- `channel`: The updated channel
+- `channel`     (**Channel**): The updated channel
 
 ### Event: on_channel_delete
 Raised when:
 - A channel is deleted
 
 Event Parameters:
-- `channel`: The deleted channel
+- `channel`     (**Channel**): The deleted channel
 
 ### Event: on_channel_pin
 Raised when:
@@ -56,8 +64,8 @@ Raised when:
 *Note: This is not raised when a pinned message is deleted.*
 
 Event Parameters:
-- `channel_id`: The id of the channel
-- `last_pin_timestamp`: The time at which the most recent pinned message was pinned
+- `channel_id`          (**int**): The id of the channel
+- `last_pin_timestamp`  (**int**): The time at which the most recent pinned message was pinned
 
 ### Event: on_guild_create
 Raised when:
@@ -66,7 +74,7 @@ Raised when:
 - When the current user joins a new Guild.
 
 Event Parameters:
-- `guild`: The guild
+- `guild`       (**Guild**): The guild
 
 ```python
 @bot.event()
@@ -83,7 +91,7 @@ Raised when:
 *Note: If the unavailable attribute is not set, the user was removed from the guild.*
 
 Event Parameters:
-- `guild`: The guild
+- `guild`       (**Guild**): The guild
 
 ```python
 @bot.event()
@@ -93,30 +101,79 @@ async def on_guild_delete(guild):
         print(f'I got removed from {guild}!')
 ```
 
+### Event: on_guild_emojis_update
+Raised when:
+- When a guild's emojis have been updated.
+
+Event Parameters:
+- `guild_id`    (**int**): The guild id
+- `emojis`      (**list\<Emoji>**): A list of emojis
+
+### Event: on_guild_integrations_update
+Raised when:
+- When a guild integration is updated.
+
+Event Parameters:
+- `guild_id`    (**int**): The guild id.
+
+### Event: on_guild_member_add
+Raised when:
+- When a new user joins a guild.
+
+Event Parameters:
+- `guild_id`    (**int**): The guild id.
+- `member`      (**GuildMember**): The user that joined.
+
+### Event: on_guild_member_remove
+Raised when:
+- A user is removed from a guild (leave/kick/ban).
+
+Event Parameters:
+- `guild_id`    (**int**): The guild id.
+- `user`        (**User**): The user that was removed/left.
+
+### Event: on_guild_member_update
+Raised when:
+- A guild member is updated
+
+Event Parameters:
+- `guild_id`    (**int**): The guild id.
+- `roles`       (**list<int>**): User role ids.
+- `user`        (**User**): The user.
+- `nick`        (**str**): Nickname of the user in the guild.
+
+### Event: on_guild_members_chunk
+Raised when:
+- In response to Guild Request Members.
+
+Event Parameters:
+- `guild_id`    (**int**): The guild id.
+- `members`       (**list<GuildMember>**): Set of guild members
+
 ### Event: on_ban
 Raised when:
 - A user is banned from a guild
 
 Event Parameters:
-- `guild_id`: The guild id
-- `user`: The banned 
+- `guild_id`    (**int**): The guild id.
+- `user`        (**User**): The banned .
 
 ### Event: on_ban_remove
 Raised when:
 - A user is unbanned from a guild
 
 Event Parameters:
-- `guild_id`: The guild id
-- `user`: The unbanned user
+- `guild_id`    (**int**): The guild id.
+- `user`        (**User**): The unbanned user.
 
 ### Event: on_typing_start
 Raised when:
 - A user starts typing in a channel
 
 Event Parameters:
-- `user_id`: The id of the user that started typing.
-- `channel_id`: The id of the channel where the action happened.
-- `timestamp`: The timestamp telling when it happened.
+- `user_id`     (**int**): The id of the user that started typing.
+- `channel_id`  (**int**): The id of the channel where the action happened.
+- `timestamp`   (**int**): The timestamp telling when it happened.
 
 ```python
 @bot.event()
@@ -130,9 +187,9 @@ Raised when:
 - A user send a message to a channel
 
 Event Parameters:
-- `user_id`: The id of the user that started typing.
-- `channel_id`: The id of the channel where the action happened.
-- `timestamp`: The timestamp telling when it happened.
+- `user_id`     (**int**): The id of the user that started typing.
+- `channel_id`  (**int**): The id of the channel where the action happened.
+- `timestamp`   (**int**): The timestamp telling when it happened.
 
 ```python
 @bot.event()
@@ -147,7 +204,7 @@ Raised when:
 *Note: Unlike creates, message updates may contain only a subset of the full message object payload (but will always contain an id and channel_id)*
 
 Event Parameters:
-- `message`: The Channel message that has been updated
+- `message` (**ChannelMessage**): The Channel message that has been updated
 
 ```python
 @bot.event()
@@ -160,8 +217,8 @@ Raised when:
 - A message is deleted.
 
 Event Parameters:
-- `id`: The id of the message
-- `channel_id`: The id of the channel
+- `id`          (**int**): The id of the message.
+- `channel_id`  (**int**): The id of the channel.
 
 ```python
 @bot.event()
@@ -174,8 +231,8 @@ Raised when:
 - Multiple messages are deleted at once.
 
 Event Parameters:
-- `ids`: The ids of the messages
-- `channel_id`: The id of the channel
+- `ids`         (**int**): The ids of the messages
+- `channel_id`  (**int**): The id of the channel
 
 ```python
 @bot.event()
@@ -188,10 +245,10 @@ Raised when:
 - A user adds a reaction to a message
 
 Event Parameters:
-- `user_id`: The id of the user
-- `channel_id`: The id of the channel
-- `message_id`: The id of the message
-- `emoji`: The emoji used to react
+- `user_id`     (**int**): The id of the user
+- `channel_id`  (**int**): The id of the channel
+- `message_id`  (**int**): The id of the message
+- `emoji`       (**Emoji**): The emoji used to react
 
 ```python
 @bot.event()
@@ -205,10 +262,10 @@ Raised when:
 - A user removes a reaction from a message
 
 Event Parameters:
-- `user_id`: The id of the user
-- `channel_id`: The id of the channel
-- `message_id`: The id of the message
-- `emoji`: The emoji used to react
+- `user_id`     (**int**): The id of the user
+- `channel_id`  (**int**): The id of the channel
+- `message_id`  (**int**): The id of the message
+- `emoji`       (**Emoji**): The emoji used to react
 
 ```python
 @bot.event()
@@ -222,5 +279,5 @@ Raised when:
 - A user explicitly removes all reactions from a message.
 
 Event Parameters:
-- `channel_id`: The id of the channel
-- `message_id`: The id of the message
+- `channel_id`  (**int**): The id of the channel
+- `message_id`  (**int**): The id of the message

@@ -4,9 +4,10 @@ import json
 import platform
 
 from .enums import GatewayOpcodes
-from .guild import Guild
+from .guild import Guild, GuildMember
 from .user import User
 from .http import HTTPHandler
+from .role import Role
 from .channel import Channel, ChannelMessage
 from .emoji import Emoji
 
@@ -151,6 +152,31 @@ class DiscordWebsocket:
         elif event == 'GUILD_BAN_REMOVE':
             guild_id = data['guild_id']
             return await self.http.get_client().raise_event('on_ban_remove', guild_id, await User.from_api_res(data))
+        
+        elif event == 'GUILD_EMOJIS_UPDATE':
+            guild_id = data['guild_id']
+            return await self.http.get_client().raise_event('on_guild_emojis_update', guild_id, await Emoji.from_api_res(data['emojis']))
+        
+        elif event == 'GUILD_INTEGRATIONS_UPDATE':
+            guild_id = data['guild_id']
+            return await self.http.get_client().raise_event('on_guild_integrations_update', guild_id)
+        
+        elif event == 'GUILD_MEMBER_ADD':
+            guild_id = data['guild_id']
+            return await self.http.get_client().raise_event('on_guild_member_add', guild_id, await GuildMember.from_api_res(data))
+        
+        elif event == 'GUILD_MEMBER_REMOVE':
+            guild_id = data['guild_id']
+            return await self.http.get_client().raise_event('on_guild_member_remove', guild_id, await User.from_api_res(data['user']))
+        
+        elif event == 'GUILD_MEMBER_UPDATE':
+            guild_id = data['guild_id']
+            return await self.http.get_client().raise_event('on_guild_member_update', guild_id, 
+                await Role.from_api_res(data['roles']), await User.from_api_res(data['user']), data['nick'])
+        
+        elif event == 'GUILD_MEMBERS_CHUNK':
+            guild_id = data['guild_id']
+            return await self.http.get_client().raise_event('on_guild_members_chunk', guild_id, await GuildMember.from_api_res(data['members']))
 
         elif event == 'TYPING_START':
             await self.http.get_client().raise_event('on_typing_start', data['user_id'], data['channel_id'], data['timestamp'])

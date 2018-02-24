@@ -32,6 +32,8 @@ class GuildMember(DiscordObject):
     async def _from_api_ext(self, key, value):
         if key == 'user':
             setattr(self, key, await User.from_api_res(value))
+        elif key == 'guild_id':
+            pass
         else:
             await super()._from_api_ext(key, value)
 

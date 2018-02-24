@@ -133,7 +133,7 @@ class DiscordWebsocket:
         elif event == 'CHANNEL_DELETE':
             return await self.http.get_client().raise_event('on_channel_delete', await Channel.from_api_res(data))
         
-        elif event == 'CHANNEL_PINS_UPDATE:
+        elif event == 'CHANNEL_PINS_UPDATE':
             return await self.http.get_client().raise_event('on_channel_pin', data['channel_id'], data['last_pin_timestamp'])
 
         elif event == 'GUILD_CREATE':

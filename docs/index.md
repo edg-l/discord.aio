@@ -15,8 +15,8 @@ Called when:
 ```python
 @bot.event()
 async def on_ready():
-    logger.info("I got called and im connected :)")
-    logger.info(f'My username is {bot.user}')
+    print('Connected!')
+    print(f'My username is {bot.user}')
 ```
 
 ### Event: on_guild_create
@@ -25,9 +25,41 @@ Called when:
 - When a Guild becomes available again to the client.
 - When the current user joins a new Guild.
 
+Event Parameters:
+- `guild_index`: The guild index to be used with `DiscordBot.guilds[index]`
+
 ```python
 @bot.event()
-async def on_guild_create():
-    logger.info("I got called and im connected :)")
-    logger.info(f'My username is {bot.user}')
+async def on_guild_create(guild_index):
+    print(f'I\'m connected to {bot.guilds[i].name} guild, it got {len(bot.guilds[i].channels)} channels.')
+```
+
+### Event: on_typing_start
+Called when:
+- A user starts typing in a channel
+
+Event Parameters:
+- `user_id`: The id of the user that started typing.
+- `channel_id`: The id of the channel where the action happened.
+- `timestamp`: The timestamp telling when it happened.
+
+```python
+@bot.event()
+async def on_typing_start(user_id, channel_id, timestamp):
+    print(f'I\'m connected to {bot.guilds[i].name} guild, it got {len(bot.guilds[i].channels)} channels.')
+```
+
+### Event: on_message
+Called when:
+- A user starts typing in a channel
+
+Event Parameters:
+- `user_id`: The id of the user that started typing.
+- `channel_id`: The id of the channel where the action happened.
+- `timestamp`: The timestamp telling when it happened.
+
+```python
+@bot.event()
+async def on_message(message):
+    print(f'{message.author}: {message.content}')
 ```

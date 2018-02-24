@@ -9,7 +9,7 @@ from .guild import Guild, GuildMember
 from .base import DiscordObject
 from .version import PYDISCORD_VERSION_STR
 from .constants import DISCORD_API_URL
-from .channel import Channel
+from .channel import Channel, ChannelMessage
 from .exceptions import WebSocketCreationError, AuthorizationError, UnhandledEndpointStatusError
 from .enums import GatewayOpcodes
 
@@ -102,6 +102,13 @@ class HTTPHandler:
                                     asyncio.ensure_future(
                                         self.discord_client.raise_event('on_guild_create', i))
                                     break
+                        elif event_type == 'TYPING_START':
+                            asyncio.ensure_future(
+                                self.discord_client.raise_event('on_typing_start', data['user_id'], data['channel_id'], data['timestamp']))
+                        elif event_type == 'MESSAGE_CREATE':
+                            message = await ChannelMessage.from_api_res(data)
+                            asyncio.ensure_future(
+                                self.discord_client.raise_event('on_message', message))
                         else:
                             logger.critical(
                                 f'Unhandled event type {event_type}, data: {data}')

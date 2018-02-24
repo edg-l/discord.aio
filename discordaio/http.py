@@ -69,19 +69,30 @@ class HTTPHandler:
                         self.heartbeat_interval = dct['d']['heartbeat_interval']
                         self._trace = dct['d']['_trace']
                         self.s = dct['s']
-                        await ws.send_json({
-                            "op": 2,  # Identify
-                            "d": {
-                                "token": self.token,
-                                "properties": {
-                                    '$os': platform.system(),
-                                    '$browser': 'discord.aio',
-                                    '$device': 'discord.aio'
-                                },
-                                "compress": False,
-                                "large_threshold": 250
-                            }
-                        })
+                        if self.session_id is not None:
+                            pass
+                            await ws.send_json({
+                                "op": 6,  # Resume
+                                "d": {
+                                    "token": self.token,
+                                    "session_id": self.session_id,
+                                    "seq": self.s
+                                }
+                            })
+                        else:
+                            await ws.send_json({
+                                "op": 2,  # Identify
+                                "d": {
+                                    "token": self.token,
+                                    "properties": {
+                                        '$os': platform.system(),
+                                        '$browser': 'discord.aio',
+                                        '$device': 'discord.aio'
+                                    },
+                                    "compress": False,
+                                    "large_threshold": 250
+                                }
+                            })
                         logger.debug(
                             f'Ensuring to heartbeat every {self.heartbeat_interval / 1000} seconds!')
                         self.heartbeat_future = asyncio.ensure_future(

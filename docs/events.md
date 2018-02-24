@@ -2,6 +2,8 @@
 
 ## Events
 - [on_ready](#event-on_ready)
+- [on_resumed](#event-on_resumed)
+- [on_invalid_session](#event-on_invalid_session)
 - [on_channel_create](#event-on_channel_create)
 - [on_channel_update](#event-on_channel_update)
 - [on_channel_delete](#event-on_channel_delete)
@@ -13,15 +15,23 @@
 - [on_guild_member_remove](#event-on_guild_member_remove)
 - [on_guild_member_update](#event-on_guild_member_update)
 - [on_guild_members_chunk](#event-on_guild_members_chunk)
+- [on_guild_role_create](#event-on_guild_role_create)
+- [on_guild_role_update](#event-on_guild_role_update)
+- [on_guild_role_delete](#event-on_guild_role_delete)
 - [on_ban](#event-on_ban)
 - [on_ban_remove](#event-on_ban_remove)
-- [on_typing_start](#event-on_typing_start)
 - [on_message](#event-on_message)
 - [on_message_update](#event-on_message_update)
 - [on_message_delete_bulk](#event-on_message_delete_bulk)
 - [on_message_reaction_add](#event-on_message_reaction_add)
 - [on_message_reaction_remove](#event-on_message_reaction_remove)
 - [on_message_reaction_remove_all](#event-on_message_reaction_remove_all)
+- [on_presence_update](#event-on_presence_update)
+- [on_typing_start](#event-on_typing_start)
+- [on_user_update](#event-on_user_update)
+- [on_voice_state_update](#event-on_voice_state_update)
+- [on_voice_server_update](#event-on_voice_server_update)
+- [on_webhooks_update](#event-on_webhooks_update)
 
 ### Event: on_ready
 Raised when:
@@ -35,6 +45,19 @@ async def on_ready():
     print('Connected!')
     print(f'My username is {bot.user}')
 ```
+
+### Event: on_resumed
+Raised when:
+- A client has sent a resume payload to the gateway (for resuming existing sessions).
+
+### Event: on_invalid_session
+Raised when:
+- The gateway could not initialize a session after receiving an Opcode 2 Identify
+- The gateway could not resume a previous session after receiving an Opcode 6 Resume
+- The gateway has invalidated an active session and is requesting client action
+
+Event Parameters:
+- `resume`  (**bool**): Indicates whether the client can resume.
 
 ### Event: on_channel_create
 Raised when:
@@ -150,6 +173,30 @@ Event Parameters:
 - `guild_id`    (**int**): The guild id.
 - `members`       (**list\<GuildMember>**): Set of guild members
 
+### Event: on_guild_role_create
+Raised when:
+- A guild role is created.
+
+Event Parameters:
+- `guild_id`    (**int**): The guild id.
+- `role`       (**Role**): The role created
+
+### Event: on_guild_role_update
+Raised when:
+- A guild role is updated.
+
+Event Parameters:
+- `guild_id`    (**int**): The guild id.
+- `role`       (**Role**): The role updated
+
+### Event: on_guild_role_delete
+Raised when:
+- A guild role is deleted.
+
+Event Parameters:
+- `guild_id`    (**int**): The guild id.
+- `role_id`       (**int**): The id of the deleted role
+
 ### Event: on_ban
 Raised when:
 - A user is banned from a guild
@@ -165,22 +212,6 @@ Raised when:
 Event Parameters:
 - `guild_id`    (**int**): The guild id.
 - `user`        (**User**): The unbanned user.
-
-### Event: on_typing_start
-Raised when:
-- A user starts typing in a channel
-
-Event Parameters:
-- `user_id`     (**int**): The id of the user that started typing.
-- `channel_id`  (**int**): The id of the channel where the action happened.
-- `timestamp`   (**int**): The timestamp telling when it happened.
-
-```python
-@bot.event()
-async def on_typing_start(user_id, channel_id, timestamp):
-    user = await bot.get_user(user_id)
-    print(f'{user} started typing!')
-```
 
 ### Event: on_message
 Raised when:
@@ -281,3 +312,65 @@ Raised when:
 Event Parameters:
 - `channel_id`  (**int**): The id of the channel
 - `message_id`  (**int**): The id of the message
+
+### Event: on_presence_update
+Raised when:
+- A user's presence is updated for a guild.
+
+*Note: The user object within this event can be partial, the only field which must be set is the id field*
+
+Event Parameters:
+- `user`  (**User**): The user presence is being updated for
+- `roles`  (**list\<int>**): Ids of the roles this user is in
+- `game`  (**?Activity**): Null, or the user's current activity
+- `guild_id`  (**?Activity**): The guild id
+- `status`  (**?Activity**): Either "idle", "dnd", "online", or "offline"
+
+### Event: on_typing_start
+Raised when:
+- A user starts typing in a channel
+
+Event Parameters:
+- `user_id`     (**int**): The id of the user that started typing.
+- `channel_id`  (**int**): The id of the channel where the action happened.
+- `timestamp`   (**int**): The timestamp telling when it happened.
+
+```python
+@bot.event()
+async def on_typing_start(user_id, channel_id, timestamp):
+    user = await bot.get_user(user_id)
+    print(f'{user} started typing!')
+```
+
+### Event: on_user_update
+Raised when:
+- Properties about the user change
+
+Event Parameters:
+- `user`     (**User**): The user that has been updated
+
+### Event: on_voice_state_update
+Raised when:
+- Someone joins/leaves/moves voice channels.
+
+Event Parameters:
+- `voice_state`     (**VoiceState**): The voice state object
+
+### Event: on_voice_server_update
+Raised when:
+- A guild's voice server is updated.
+- This is sent when initially connecting to voice, and when the current voice instance fails over to a new server.
+
+Event Parameters:
+- `token`	        (**str**): Voice connection token-
+- `guild_id`        (**int**): The guild this voice server update is for
+- `endpoint`        (**str**): The voice server host
+
+### Event: on_webhooks_update
+Raised when:
+- A guild's voice server is updated.
+- This is sent when initially connecting to voice, and when the current voice instance fails over to a new server.
+
+Event Parameters:
+- `guild_id`        (**int**): Id of the guild
+- `channel_id`      (**int**): Id of the channel

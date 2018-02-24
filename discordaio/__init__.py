@@ -22,3 +22,5 @@ from .enums import ChannelTypes, ExplicitContentFilterLevel, MessageActivityType
 from .exceptions import WebSocketCreationError, AuthorizationError, EventTypeError, UnhandledEndpointStatusError
 from .base import DiscordObject
 from .voice import VoiceRegion, VoiceState
+from .activity import Activity, ActivityAssets, ActivityParty, ActivityTimestamps
+from .constants import DISCORD_API_URL, DISCORD_CDN

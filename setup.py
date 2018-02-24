@@ -7,7 +7,7 @@ except(IOError, ImportError):
     long_description = open('README.md').read()
 
 setup(name='discord.aio',
-      version='0.1.8',
+      version='0.2.0',
       description='discord.aio is an asynchronous Discord API wrapper for asyncio and python',
       long_description=long_description,
       url='https://github.com/Ryozuki/discord.aio',

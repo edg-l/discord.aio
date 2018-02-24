@@ -60,5 +60,4 @@ You can also check the [documentation](https://ryozuki.github.io/discord.aio/doc
 ## TODO
 - [Add compression support](https://discordapp.com/developers/docs/topics/gateway#encoding-and-compression)
 - [Add bot shards support](https://discordapp.com/developers/docs/topics/gateway#get-gateway-bot)
-- [Handle all discord events](https://discordapp.com/developers/docs/topics/gateway#commands-and-events-gateway-events)
 - Handle ISO8601 timestamp

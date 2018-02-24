@@ -53,7 +53,7 @@ async def on_typing_start(user_id, channel_id, timestamp):
 
 ### Event: on_message
 Called when:
-- A user starts typing in a channel
+- A user send a message to a channel
 
 Event Parameters:
 - `user_id`: The id of the user that started typing.

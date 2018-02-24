@@ -11,6 +11,7 @@ The project is under early development, so the documentation is heavily incomple
 ### Event: on_ready
 Called when:
 - The client is ready and connected.
+
 ```python
 @bot.event()
 async def on_ready():

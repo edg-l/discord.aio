@@ -14,6 +14,9 @@ from .emoji import Emoji
 from .user import User, UserConnection
 from .guild import Guild, GuildEmbed, GuildMember, Integration, IntegrationAccount
 from .role import Role
+from .http import HTTPHandler
+from .websocket import DiscordWebsocket
+from .webhook import Webhook
 from .invite import Invite, InviteMetadata
 from .enums import ChannelTypes, ExplicitContentFilterLevel, MessageActivityTypes, MessageNotificationLevel, MFALevel, VerificationLevel
 from .exceptions import WebSocketCreationError, AuthorizationError, EventTypeError, UnhandledEndpointStatusError

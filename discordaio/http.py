@@ -39,6 +39,8 @@ class HTTPHandler:
             headers=self.headers, auto_decompress=True)
 
     async def close_session(self):
+        if self.ws is not None:
+            await self.ws.close()
         await self.session.close()
 
     async def start_websocket(self):
@@ -52,6 +54,7 @@ class HTTPHandler:
         self.heartbeat_future = None
         self.session_id = None
         async with self.session.ws_connect(self.gateway_url + '?v=6&encoding=json') as ws:
+            self.ws = ws
             async for msg in ws:
                 # logger.debug(msg)
                 if msg.type == aiohttp.WSMsgType.TEXT:

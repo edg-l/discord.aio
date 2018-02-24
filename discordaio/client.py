@@ -89,6 +89,13 @@ class DiscordBot:
     async def start(self):
         await self.httpHandler.create_session()
         await self.httpHandler.start_websocket()
+    
+    async def exit(self):
+        try:
+            task_handler()
+            await self.httpHandler.close_session()
+        except asyncio.CancelledError:
+            pass
 
     async def change_avatar(self, url):
         raise NotImplementedError()

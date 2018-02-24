@@ -94,6 +94,17 @@ class HTTPHandler:
                             self.discord_client.guilds = await Guild.from_api_res(data['guilds'])
                             asyncio.ensure_future(
                                 self.discord_client.raise_event('on_ready'))
+                        elif event_type == 'GUILD_CREATE':
+                            guild_id = data['id']
+                            for i, guild in enumerate(self.discord_client.guilds):
+                                if guild.id == guild_id:
+                                    self.discord_client.guilds[i] = await Guild.from_api_res(data)
+                                    asyncio.ensure_future(
+                                        self.discord_client.raise_event('on_guild_create', i))
+                                    break
+                        else:
+                            logger.critical(
+                                f'Unhandled event type {event_type}, data: {data}')
 
     async def send_heartbeat(self, ws):
         while True:

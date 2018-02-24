@@ -53,7 +53,8 @@ class DiscordBot:
 
     async def raise_event(self, event, *args, **kwargs):
         try:
-            await getattr(self, event)(*args, **kwargs)
+            if hasattr(self, event):
+                await getattr(self, event)(*args, **kwargs)
         except asyncio.CancelledError as e:
             logger.error(e, exc_info=1)
             pass
@@ -135,24 +136,19 @@ class DiscordBot:
         return await GuildMember.from_api_res(res)
 
     async def leave_guild(self, guild_id):
-        res = await self.httpHandler.request_url(f'/users/@me/guilds/{guild_id}', type='DELETE')
-        # TODO: redo this! it doesnt work anymore due to res not being a ClientResponse!
-        if res.status == 204:
-            return True
-        else:
-            return False
+        await self.httpHandler.request_url(f'/users/@me/guilds/{guild_id}', type='DELETE')
 
     async def get_channel(self, channel_id):
         res = await self.httpHandler.request_url(f'/channels/{channel_id}')
         return await Channel.from_api_res(res)
 
     async def delete_channel(self, channel_id):
+        """Delete a channel, or close a private message. Requires the 'MANAGE_CHANNELS' permission for the guild. 
+        Deleting a category does not delete its child channels; they will have their parent_id removed and a Channel Update Gateway event will fire for each of them. 
+        Returns a channel object on success. 
+        Fires a Channel Delete Gateway event."""
         res = await self.httpHandler.request_url(f'/channels/{channel_id}', type='DELETE')
-        # TODO: redo this! it doesnt work anymore due to res not being a ClientResponse!
-        if res.status == 204:
-            return True
-        else:
-            return False
+        return await Channel.from_api_res(res)
 
     async def get_dms(self):
         res = await self.httpHandler.request_url('/users/@me/channels')

@@ -42,3 +42,9 @@ class User(DiscordObject):
 
     def get_default_avatar_url(self):
         return DISCORD_CDN + f'/embed/avatars/{int(self.discriminator) % 5}.png'
+    
+    async def _from_api_ext(self, key, value):
+        if key == 'guild_id':
+            pass
+        else:
+            await super()._from_api_ext(key, value)

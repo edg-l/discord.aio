@@ -115,30 +115,20 @@ class HTTPHandler:
                 self.discord_client.raise_event('on_ready'))
 
         elif event == 'GUILD_CREATE':
-            guild_id = data['id']
-
-            for i, guild in enumerate(self.discord_client.guilds):
-                if guild.id == guild_id:
-                    self.discord_client.guilds[i] = await Guild.from_api_res(data)
-                    return await self.discord_client.raise_event('on_guild_create', self.discord_client.guilds[i])
-            
-            logger.debug('(GUILD_CREATE), guild not found in guilds, added to the list.')
             guild = await Guild.from_api_res(data)
-            self.discord_client.guilds.append(guild)
             return await self.discord_client.raise_event('on_guild_create', guild)
         
         elif event == 'GUILD_DELETE':
-            guild_id = data['id']
-
-            for i, guild in enumerate(self.discord_client.guilds):
-                if guild.id == guild_id:
-                    self.discord_client.guilds[i].unavailable = True
-                    return await self.discord_client.raise_event('on_guild_delete', self.discord_client.guilds[i])
-            
-            logger.debug('(GUILD_DELETE), guild not found in guilds, added to the list.')
             guild = await Guild.from_api_res(data)
-            self.discord_client.guilds.append(guild)
             return await self.discord_client.raise_event('on_guild_delete', guild)
+        
+        elif event == 'GUILD_BAN_ADD':
+            guild_id = data['guild_id']
+            return await self.discord_client.raise_event('on_ban', guild_id, await User.from_api_res(data))
+
+        elif event == 'GUILD_BAN_REMOVE':
+            guild_id = data['guild_id']
+            return await self.discord_client.raise_event('on_ban_remove', guild_id, await User.from_api_res(data))
 
         elif event == 'TYPING_START':
             await self.discord_client.raise_event('on_typing_start', data['user_id'], data['channel_id'], data['timestamp'])

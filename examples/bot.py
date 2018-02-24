@@ -25,11 +25,14 @@ if __name__ == '__main__':
     @bot.event()
     async def on_message(message):
         logger.info(f'{message.author}: {message.content}')
-        await bot.exit()
     
     @bot.event()
     async def on_message_reaction_add(user_id, channel_id, message_id, emoji):
         user = await bot.get_user(user_id)
         logger.info(f'{user} reacted to a message with {emoji.name}')
+
+    @bot.event()
+    async def on_ban(guild_id, user):
+        logger.info(f'{user} has been banned')
 
     bot.run()

@@ -3,6 +3,7 @@
 ## Events
 - [on_ready](#event-on_ready)
 - [on_guild_create](#event-on_guild_create)
+- [on_guild_delete](#event-on_guild_delete)
 - [on_typing_start](#event-on_typing_start)
 - [on_message](#event-on_message)
 - [on_message_update](#event-on_message_update)

@@ -41,6 +41,7 @@ class HTTPHandler:
 
     async def close_session(self):
         await self.session.close()
+        logger.debug('Session closed!')
 
     def update_headers(self):
         self.headers = {'Authorization': 'Bot ' + self.token,

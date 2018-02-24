@@ -26,4 +26,7 @@ if __name__ == '__main__':
     async def on_message(message):
         logger.info(f'{message.author}: {message.content}')
 
+    @bot.event()
+    async def on_typing_start(user_id, channel_id, timestamp):
+        logger.info(f'User with id {user_id} started typing!')
     bot.run()

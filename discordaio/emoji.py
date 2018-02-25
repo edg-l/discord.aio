@@ -25,3 +25,8 @@ class Emoji(DiscordObject):
 
     def get_url(self):
         return DISCORD_CDN + f'/emojis/{self.id}.png'
+
+
+__all__ = [
+    'Emoji',
+]

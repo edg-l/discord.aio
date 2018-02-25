@@ -5,6 +5,7 @@ import aiohttp
 import logging
 logger = logging.getLogger(__name__)
 
+
 class DiscordObject:
     """Base class for discord objects."""
 
@@ -47,3 +48,8 @@ class DiscordObject:
         Used if the class contains a attribute that it's a class and must be initialized with info,
         also used if the class contains an array of classes as attribute."""
         setattr(self, key, value)
+
+
+__all__ = [
+    'DiscordObject',
+]

@@ -126,10 +126,10 @@ class DiscordWebsocket:
             self.http.get_client().user = await User.from_api_res(data['user'])
             self.http.get_client().guilds = await Guild.from_api_res(data['guilds'])
             return await self.http.get_client().raise_event('on_ready')
-        
+
         elif event == 'RESUMED':
             return await self.http.get_client().raise_event('on_resumed')
-        
+
         elif event == 'INVALID_SESSION':
             return await self.http.get_client().raise_event('on_invalid_session', data)
 
@@ -233,19 +233,24 @@ class DiscordWebsocket:
 
         elif event == 'TYPING_START':
             await self.http.get_client().raise_event('on_typing_start', data['user_id'], data['channel_id'], data['timestamp'])
-        
+
         elif event == 'USER_UPDATE':
             await self.http.get_client().raise_event('on_user_update', await User.from_api_res(data))
-        
+
         elif event == 'VOICE_STATE_UPDATE':
             await self.http.get_client().raise_event('on_voice_state_update', await VoiceState.from_api_res(data))
 
         elif event == 'VOICE_SERVER_UPDATE':
             await self.http.get_client().raise_event('on_voice_server_update', data['token'], data['guild_id'], data['endpoint'])
-        
+
         elif event == 'WEBHOOKS_UPDATE':
             await self.http.get_client().raise_event('on_webhooks_update', data['guild_id'], data['channel_id'])
 
         else:
             logger.critical(
                 f'Unhandled event type {event}, data: {data}')
+
+
+__all__ = [
+    'DiscordWebsocket',
+]

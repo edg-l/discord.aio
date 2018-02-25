@@ -18,3 +18,8 @@ class Role(DiscordObject):
 
     def __repr__(self):
         return f'<Role Object: {self.name}#{self.id}>'
+
+
+__all__ = [
+    'Role',
+]

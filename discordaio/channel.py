@@ -15,7 +15,27 @@ class Overwrite(DiscordObject):
 
 
 class Channel(DiscordObject):
-    """Represents a guild or DM channel within Discord."""
+    """Represents a guild or DM channel within Discord.
+
+    Attributes:
+        id (:obj:`int`): the id of this channel
+        value_type (:obj:`int`): the value_type of channel
+        guild_id (:obj:`int`, optional): the id of the guild
+        position (:obj:`int`, optional): sorting position of the channel
+        permission_overwrites (:obj:`list` of Overwrite, optional): explicit permission overwrites for members and roles
+        name (:obj:`str`, optional): the name of the channel (2-100 characters)
+        topic (:obj:`str`, optional): the channel topic (0-1024 characters)
+        nsfw (:obj:`bool`, optional): if the channel is nsfw
+        last_message_id (:obj:`int`, optional): the id of the last message sent in this channel (may not point to an existing or valid message)
+        bitrate (:obj:`int`, optional): the bitrate (in bits) of the voice channel
+        user_limit (:obj:`int`, optional): the user limit of the voice channel
+        recipients (:obj:`list` of User, optional): the recipients of the DM
+        icon (:obj:`str`, optional): icon hash
+        owner_id (:obj:`int`, optional): id of the DM creator
+        application_id (:obj:`int`, optional): application id of the group DM creator if it is bot-created
+        parent_id (:obj:`int`, optional): id of the parent category for a channel
+        last_pin_timestamp (:obj:`int`, optional): timestamp when the last pinned message was pinned
+    """
 
     def __init__(self, id=0, type=0, guild_id=0, position=0, permission_overwrites=[],
                  name="", topic="", nsfw=False, last_message_id=0,

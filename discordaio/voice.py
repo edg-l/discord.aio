@@ -1,10 +1,16 @@
+from typing import Optional
 from .base import DiscordObject
 
 
 class VoiceState(DiscordObject):
-    def __init__(self, guild_id=0, channel_id=0, user_id=0, session_id="", deaf=False,
+    """Used to represent a user's voice connection status.
+    
+    Attributes:
+        guild_id (:obj:`int`, optional):
+    """
+    def __init__(self, guild_id: Optional[int]=None, channel_id: int=0, user_id: int=0, session_id: str='', deaf=False,
                  mute=False, self_deaf=False, self_mute=False, suppress=False):
-        self.guild_id = guild_id
+        self.guild_id: int = guild_id
         self.channel_id = channel_id
         self.user_id = user_id
         self.session_id = session_id

@@ -29,7 +29,7 @@ class Channel(DiscordObject):
         last_message_id (:obj:`int`, optional): the id of the last message sent in this channel (may not point to an existing or valid message)
         bitrate (:obj:`int`, optional): the bitrate (in bits) of the voice channel
         user_limit (:obj:`int`, optional): the user limit of the voice channel
-        recipients (:obj:`list` of User, optional): the recipients of the DM
+        recipients (:obj:`list` of :class:`.User`, optional): the recipients of the DM
         icon (:obj:`str`, optional): icon hash
         owner_id (:obj:`int`, optional): id of the DM creator
         application_id (:obj:`int`, optional): application id of the group DM creator if it is bot-created

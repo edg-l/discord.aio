@@ -24,3 +24,9 @@ class VoiceRegion(DiscordObject):
         self.optimal = optimal
         self.deprecated = deprecated
         self.custom = custom
+
+
+__all__ = [
+    'VoiceState',
+    'VoiceRegion',
+]

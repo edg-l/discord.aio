@@ -43,3 +43,11 @@ class Activity(DiscordObject):
             setattr(self, key, await ActivityAssets.from_api_res(value))
         else:
             await super()._from_api_ext(key, value)
+
+
+__all__ = [
+    'Activity',
+    'ActivityParty',
+    'ActivityTimestamps',
+    'ActivityAssets',
+]

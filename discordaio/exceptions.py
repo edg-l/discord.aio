@@ -13,3 +13,10 @@ class AuthorizationError(Exception):
 
 class UnhandledEndpointStatusError(Exception):
     pass
+
+__all__ = [
+    'WebSocketCreationError',
+    'EventTypeError',
+    'AuthorizationError',
+    'VeriUnhandledEndpointStatusErrorficationLevel',
+]

@@ -15,3 +15,8 @@ class Webhook(DiscordObject):
         self.name = name
         self.avatar = avatar
         self.token = token
+
+
+__all__ = [
+    'Webhook',
+]

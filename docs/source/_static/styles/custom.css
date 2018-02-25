@@ -35,5 +35,9 @@ dl.data dt code.descclassname {
 }
 
 code {
-    font-size: 100% !important
+    font-size: 100% !important;
+}
+
+.versionadded {
+    font-style: italic;
 }

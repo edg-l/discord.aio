@@ -7,6 +7,7 @@ Version 0.2.2
 * Added DiscordBot.get_guild_channels method
 * Added DiscordBot.create_guild_channel method
 * Added DiscordBot.delete_guild method
+* Added DiscordBot.move_channels method
 * Added NotFoundError exception
 * Added GatewayUnavailable exception
 * Added BadRequestError exception

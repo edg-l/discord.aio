@@ -60,6 +60,8 @@ class HTTPHandler:
                 operation = self.session.post(DISCORD_API_URL + url, json=data)
             elif type == 'DELETE':
                 operation = self.session.delete(DISCORD_API_URL + url)
+            elif type == 'PATCH':
+                operation = self.session.patch(DISCORD_API_URL + url, json=data)
 
             async with operation as res:
                 if res.status == 429:
@@ -75,9 +77,12 @@ class HTTPHandler:
                     await asyncio.sleep(limit.retry_after / 1000)
                     logger.debug("Done waiting! Requesting again")
                 elif res.status < 300 and res.status >= 200:
-                    return await res.json()
+                    try:
+                        return await res.json()
+                    except aiohttp.client_exceptions.ContentTypeError:
+                        return
                 elif res.status == 400:
-                    raise BadRequestError('The request was improperly formatted, or the server couldn\'t understand it')
+                    raise BadRequestError(f'The request was improperly formatted, or the server couldn\'t understand it: {data}')
                 elif res.status == 401:
                     raise AuthorizationError('The Authorization header was missing or invalid')
                 elif res.status == 403:

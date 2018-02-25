@@ -169,7 +169,7 @@ class DiscordBot:
         """
         res = await self.http.request_url('/guilds/' + str(guild_id))
         return await Guild.from_api_res(res)
-    
+
     async def get_guild_channels(self, guild_id: int) -> Channel:
         """Returns a list of channel objects.
 
@@ -270,6 +270,25 @@ class DiscordBot:
         res = await self.http.request_url('/guilds/' + guild.id + '/members/' + member_id)
         return await GuildMember.from_api_res(res)
 
+    async def move_channels(self, guild_id, array: list):
+        """Modify the positions of a set of channel objects for the guild.
+
+        Note:
+            Requires 'MANAGE_CHANNELS' permission.
+            Fires multiple Channel Update events.
+            Only channels to be modified are required, with the minimum being a swap between at least two channels.
+
+        Args:
+            array (:obj:`list` of :obj:`tuple`): A list of tuples containing (channel_id, position)
+        """
+        data = []
+
+        for tup in array:
+            channel_id, position = tup
+            data.append({'id': channel_id, 'position': position})
+
+        await self.http.request_url(f'/guilds/{guild_id}/channels', type='PATCH', data=data)
+
     async def leave_guild(self, guild_id: int):
         """Leaves a guild.
 
@@ -297,13 +316,13 @@ class DiscordBot:
     async def delete_channel(self, channel_id: int) -> Channel:
         """Deletes a channel.
 
+        .. versionadded:: 0.2.0
+
         Note:
             Delete a channel, or close a private message. Requires the 'MANAGE_CHANNELS' permission for the guild.
             Deleting a category does not delete its child channels; they will have their parent_id removed and a Channel Update Gateway event will fire for each of them.
             Returns a channel object on success.
             Fires a Channel Delete Gateway event.
-
-        .. versionadded:: 0.2.0
 
         Args:
             channel_id (:obj:`int`): The channel id

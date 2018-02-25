@@ -105,3 +105,4 @@ TODO
 * `Add compression support <https://discordapp.com/developers/docs/topics/gateway#encoding-and-compression>`_
 * `Add bot shards support <https://discordapp.com/developers/docs/topics/gateway#get-gateway-bot>`_
 * Handle ISO8601 timestamp
+* Make the DiscordBot methods better.

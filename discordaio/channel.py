@@ -7,6 +7,15 @@ from .emoji import Emoji
 
 
 class Overwrite(DiscordObject):
+    """Represents a Overwrite object.
+
+    Attributes:
+        id (:obj:`int`): role or user id
+        type (:obj:`str`): either "role" or "member"
+        allow (:obj:`int`): permission bit set
+        deny (:obj:`int`): permission bit set
+    """
+
     def __init__(self, id=0, type="", allow=0, deny=0):
         self.id = id
         self.type = type
@@ -128,6 +137,15 @@ class Reaction(DiscordObject):
 
 
 class EmbedThumbnail(DiscordObject):
+    """Represents a embed thumbnail object
+
+    Attributes:
+        url (:obj:`str`): source url of thumbnail (only supports http(s) and attachments)
+        proxy_url (:obj:`str`): a proxied url of the thumbnail
+        height (:obj:`int`): height of thumbnail
+        width (:obj:`int`): width of thumbnail
+    """
+
     def __init__(self, url="", proxy_url="", height=0, width=0):
         self.url = url
         self.proxy_url = proxy_url
@@ -136,6 +154,14 @@ class EmbedThumbnail(DiscordObject):
 
 
 class EmbedVideo(DiscordObject):
+    """Represents a embed video
+
+    Attributes:
+        url (:obj:`str`): source url of video
+        height (:obj:`int`): height of video
+        width (:obj:`int`): width of video
+    """
+
     def __init__(self, url="", height=0, width=0):
         self.url = url
         self.height = height
@@ -143,6 +169,15 @@ class EmbedVideo(DiscordObject):
 
 
 class EmbedImage(DiscordObject):
+    """Represents a embed image
+
+    Attributes:
+        url (:obj:`str`): source url of image (only supports http(s) and attachments)
+        proxy_url (:obj:`str`): a proxied url of the image
+        height (:obj:`int`): height of image
+        width (:obj:`int`): width of image
+    """
+
     def __init__(self, url="", proxy_url="", height=0, width=0):
         self.url = url
         self.proxy_url = proxy_url
@@ -151,12 +186,28 @@ class EmbedImage(DiscordObject):
 
 
 class EmbedProvider(DiscordObject):
+    """Represents a embed provider
+
+    Attributes:
+        name (:obj:`str`): name of provider
+        url (:obj:`str`): url of provider
+    """
+
     def __init__(self, name="", url=""):
         self.name = name
         self.url = url
 
 
 class EmbedAuthor(DiscordObject):
+    """Represents a embed author
+
+    Attributes:
+        name (:obj:`str`): name of author
+        url (:obj:`str`): url of author
+        icon_url (:obj:`str`): url of author icon (only supports http(s) and attachments)
+        proxy_icon_url (:obj:`str`): a proxied url of author icon
+    """
+
     def __init__(self, name="", url="", icon_url="", proxy_icon_url=""):
         self.name = name
         self.url = url
@@ -165,6 +216,14 @@ class EmbedAuthor(DiscordObject):
 
 
 class EmbedFooter(DiscordObject):
+    """Represents a embed footer
+
+    Attributes:
+        text (:obj:`str`): footer text
+        icon_url (:obj:`str`): url of footer icon (only supports http(s) and attachments)
+        proxy_icon_url (:obj:`str`): a proxied url of footer icon
+    """
+
     def __init__(self, text="", icon_url="", proxy_icon_url=""):
         self.text = text
         self.icon_url = icon_url
@@ -172,6 +231,14 @@ class EmbedFooter(DiscordObject):
 
 
 class EmbedField(DiscordObject):
+    """Represents a embed field
+
+    Attributes:
+        name (:obj:`str`): name of the field
+        value (:obj:`str`): value of the field
+        inline (:obj:`bool`): whether or not this field should display inline
+    """
+
     def __init__(self, name="", value="", inline=False):
         self.name = name
         self.value = value
@@ -179,6 +246,24 @@ class EmbedField(DiscordObject):
 
 
 class Embed(DiscordObject):
+    """Represents a discord Embed
+
+    Attributes:
+        title (:obj:`str`): title of embed
+        type (:obj:`str`): type of embed (always "rich" for webhook embeds)
+        description (:obj:`str`): description of embed
+        url (:obj:`str`): url of embed
+        timestamp (:obj:`int`): timestamp of embed content
+        color (:obj:`int`): color code of the embed
+        footer (:class:`.EmbedFooter`): footer information
+        image (:class:`.EmbedImage`): image information
+        thumbnail (:class:`.EmbedThumbnail`): thumbnail information
+        video (:class:`.EmbedVideo`): video information
+        provider (:class:`.EmbedProvider`): provider information
+        author (:class:`.EmbedAuthor`): author information
+        fields (:obj:`list` of :class:`.EmbedField`): fields information
+    """
+
     def __init__(self, title="", type="", description="", url="", timestamp=None,
                  color=0, footer=EmbedFooter(), image=EmbedImage(), thumbnail=EmbedThumbnail(),
                  video=EmbedVideo(), provider=EmbedProvider(), author=EmbedAuthor(), fields=[]):
@@ -216,6 +301,18 @@ class Embed(DiscordObject):
 
 
 class Attachment(DiscordObject):
+    """Represents a attachment
+
+    Attributes:
+        id (:obj:`int`): attachment id
+        filename (:obj:`str`): name of file attached
+        size (:obj:`int`): size of file in bytes
+        url (:obj:`str`): source url of file
+        proxy_url (:obj:`str`): a proxied url of file
+        height (:obj:`int`): height of file (if image)
+        width (:obj:`int`): width of file (if image)
+    """
+
     def __init__(self, id=0, filename="", size=0, url="", proxy_url="",
                  height=0, width=0):
         self.id = id

@@ -22,7 +22,7 @@ class Channel(DiscordObject):
         value_type (:obj:`int`): the value_type of channel
         guild_id (:obj:`int`, optional): the id of the guild
         position (:obj:`int`, optional): sorting position of the channel
-        permission_overwrites (:obj:`list` of Overwrite, optional): explicit permission overwrites for members and roles
+        permission_overwrites (:obj:`list` of :class:`.Overwrite`, optional): explicit permission overwrites for members and roles
         name (:obj:`str`, optional): the name of the channel (2-100 characters)
         topic (:obj:`str`, optional): the channel topic (0-1024 characters)
         nsfw (:obj:`bool`, optional): if the channel is nsfw

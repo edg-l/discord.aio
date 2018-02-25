@@ -8,7 +8,17 @@ from .constants import DISCORD_CDN
 
 
 class UserConnection(DiscordObject):
-    """A Discord User Connection"""
+    """Represents a discord user connection
+
+    .. versionadded:: 0.2.0
+
+    Attributes:
+        id (:obj:`str`): id of the connection account
+        name (:obj:`str`): the username of the connection account
+        type (:obj:`str`): the service of the connection (twitch, youtube)
+        revoked (:obj:`bool`): whether the connection is revoked
+        integrations (:obj:`list`): an array of partial server integrations
+    """
 
     def __init__(self, id="", name="", type="", revoked=False, integrations=[]):
         self.id = id
@@ -19,7 +29,20 @@ class UserConnection(DiscordObject):
 
 
 class User(DiscordObject):
-    """A Discord User Object"""
+    """Represents a discord user
+
+    .. versionadded:: 0.2.0
+
+    Attributes:
+        id (:obj:`int`): the user's id identify
+        username (:obj:`str`): the user's username, not unique across the platform identify
+        discriminator (:obj:`str`): the user's 4-digit discord-tag identify
+        avatar (:obj:`str`): the user's avatar hash identify
+        bot (:obj:`bool`, optional): whether the user belongs to an OAuth2 application identify
+        mfa_enabled (:obj:`bool`, optional): whether the user has two factor enabled on their account identify
+        verified (:obj:`bool`, optional): whether the email on this account has been verified email
+        email (:obj:`str`, optional): the user's email email
+    """
 
     def __init__(self, id=0, username="", discriminator="", avatar="", bot=False,
                  mfa_enabled=False, verified=False, email=""):

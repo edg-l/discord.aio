@@ -168,7 +168,7 @@ class Guild(DiscordObject):
             member (:class:`.GuildMember`): The member
 
         Returns:
-            boo: True if it's the owner, False otherwise.
+            bool: True if it's the owner, False otherwise.
         """
         return self.owner_id == member.user.id
 

@@ -11,9 +11,23 @@ class EventTypeError(Exception):
 
 
 class AuthorizationError(Exception):
-    def __init__(self):
-        print(
-            'You requested a api endpoint which you have no authorization', file=sys.stderr)
+    def __init__(self, message):
+        self.message = message
+
+
+class BadRequestError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
+class NotFoundError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
+class GatewayUnavailable(Exception):
+    def __init__(self, message):
+        self.message = message
 
 
 class UnhandledEndpointStatusError(Exception):

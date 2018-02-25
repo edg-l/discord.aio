@@ -10,7 +10,7 @@ from .base import DiscordObject
 from .constants import DISCORD_API_URL
 from .channel import Channel, ChannelMessage
 from .emoji import Emoji
-from .exceptions import WebSocketCreationError, AuthorizationError, UnhandledEndpointStatusError
+from .exceptions import WebSocketCreationError, AuthorizationError, NotFoundError, GatewayUnavailable, UnhandledEndpointStatusError, BadRequestError
 from .enums import GatewayOpcodes
 from .version import __version__
 
@@ -51,12 +51,13 @@ class HTTPHandler:
         return self.discord_client
 
     async def request_url(self, url, type='GET', data=None):
+
         while True:
             operation = None
             if type == 'GET':
                 operation = self.session.get(DISCORD_API_URL + url)
             elif type == 'POST':
-                operation = self.session.post(DISCORD_API_URL + url, data=data)
+                operation = self.session.post(DISCORD_API_URL + url, json=data)
             elif type == 'DELETE':
                 operation = self.session.delete(DISCORD_API_URL + url)
 
@@ -75,8 +76,16 @@ class HTTPHandler:
                     logger.debug("Done waiting! Requesting again")
                 elif res.status < 300 and res.status >= 200:
                     return await res.json()
+                elif res.status == 400:
+                    raise BadRequestError('The request was improperly formatted, or the server couldn\'t understand it')
                 elif res.status == 401:
-                    raise AuthorizationError
+                    raise AuthorizationError('The Authorization header was missing or invalid')
+                elif res.status == 403:
+                    raise AuthorizationError('The Authorization token you passed did not have permission to the resource')
+                elif res.status == 404:
+                    raise NotFoundError('The resource at the location specified doesn\'t exist')
+                elif res.status == 502:
+                    raise GatewayUnavailable('There was not a gateway available to process your request. Wait a bit and retry')
                 else:
                     raise UnhandledEndpointStatusError
 

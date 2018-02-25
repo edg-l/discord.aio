@@ -18,7 +18,7 @@ class Overwrite(DiscordObject):
         deny (:obj:`int`): permission bit set
     """
 
-    def __init__(self, id=0, type="", allow=0, deny=0):
+    def __init__(self, id=None, type=None, allow=None, deny=None):
         self.id = id
         self.type = type
         self.allow = allow
@@ -50,10 +50,10 @@ class Channel(DiscordObject):
         last_pin_timestamp (:obj:`int`, optional): timestamp when the last pinned message was pinned
     """
 
-    def __init__(self, id=0, type=0, guild_id=0, position=0, permission_overwrites=[],
-                 name="", topic="", nsfw=False, last_message_id=0,
-                 bitrate=0, user_limit=0, recipients=[], icon="",
-                 owner_id=0, application_id=0, parent_id=0, last_pin_timestamp=None):
+    def __init__(self, id=None, type=None, guild_id=None, position=None, permission_overwrites=[],
+                 name=None, topic=None, nsfw=False, last_message_id=None,
+                 bitrate=None, user_limit=None, recipients=[], icon=None,
+                 owner_id=None, application_id=None, parent_id=None, last_pin_timestamp=None):
         self.id = id
         self.type = type
         self.guild_id = guild_id
@@ -97,7 +97,7 @@ class MessageActivity(DiscordObject):
         party_id (:obj:`str`, optional): party_id from a Rich Presence event
     """
 
-    def __init__(self, type=None, party_id=""):
+    def __init__(self, type=None, party_id=None):
         self.type = type
         self.party_id = party_id
 
@@ -115,7 +115,7 @@ class MessageApplication(DiscordObject):
         name (:obj:`str`): name of the application
     """
 
-    def __init__(self, id=0, cover_image="", description="", icon="", name=""):
+    def __init__(self, id=None, cover_image=None, description=None, icon=None, name=None):
         self.id = id
         self.cover_image = cover_image
         self.description = description
@@ -134,7 +134,7 @@ class Reaction(DiscordObject):
         emoji (:class:`.Emoji`): emoji information
     """
 
-    def __init__(self, count=0, me=False, emoji=None):
+    def __init__(self, count=None, me=False, emoji=None):
         self.count = count
         self.me = me
         self.emoji = emoji
@@ -158,7 +158,7 @@ class EmbedThumbnail(DiscordObject):
         width (:obj:`int`): width of thumbnail
     """
 
-    def __init__(self, url="", proxy_url="", height=0, width=0):
+    def __init__(self, url=None, proxy_url=None, height=None, width=None):
         self.url = url
         self.proxy_url = proxy_url
         self.height = height
@@ -176,7 +176,7 @@ class EmbedVideo(DiscordObject):
         width (:obj:`int`): width of video
     """
 
-    def __init__(self, url="", height=0, width=0):
+    def __init__(self, url=None, height=None, width=None):
         self.url = url
         self.height = height
         self.width = width
@@ -194,7 +194,7 @@ class EmbedImage(DiscordObject):
         width (:obj:`int`): width of image
     """
 
-    def __init__(self, url="", proxy_url="", height=0, width=0):
+    def __init__(self, url=None, proxy_url=None, height=None, width=None):
         self.url = url
         self.proxy_url = proxy_url
         self.height = height
@@ -211,7 +211,7 @@ class EmbedProvider(DiscordObject):
         url (:obj:`str`): url of provider
     """
 
-    def __init__(self, name="", url=""):
+    def __init__(self, name=None, url=None):
         self.name = name
         self.url = url
 
@@ -228,7 +228,7 @@ class EmbedAuthor(DiscordObject):
         proxy_icon_url (:obj:`str`): a proxied url of author icon
     """
 
-    def __init__(self, name="", url="", icon_url="", proxy_icon_url=""):
+    def __init__(self, name=None, url=None, icon_url=None, proxy_icon_url=None):
         self.name = name
         self.url = url
         self.icon_url = icon_url
@@ -246,7 +246,7 @@ class EmbedFooter(DiscordObject):
         proxy_icon_url (:obj:`str`): a proxied url of footer icon
     """
 
-    def __init__(self, text="", icon_url="", proxy_icon_url=""):
+    def __init__(self, text=None, icon_url=None, proxy_icon_url=None):
         self.text = text
         self.icon_url = icon_url
         self.proxy_icon_url = proxy_icon_url
@@ -263,7 +263,7 @@ class EmbedField(DiscordObject):
         inline (:obj:`bool`): whether or not this field should display inline
     """
 
-    def __init__(self, name="", value="", inline=False):
+    def __init__(self, name=None, value=None, inline=False):
         self.name = name
         self.value = value
         self.inline = inline
@@ -290,8 +290,8 @@ class Embed(DiscordObject):
         fields (:obj:`list` of :class:`.EmbedField`): fields information
     """
 
-    def __init__(self, title="", type="", description="", url="", timestamp=None,
-                 color=0, footer=EmbedFooter(), image=EmbedImage(), thumbnail=EmbedThumbnail(),
+    def __init__(self, title=None, type=None, description=None, url=None, timestamp=None,
+                 color=None, footer=EmbedFooter(), image=EmbedImage(), thumbnail=EmbedThumbnail(),
                  video=EmbedVideo(), provider=EmbedProvider(), author=EmbedAuthor(), fields=[]):
         self.title = title
         self.type = type
@@ -341,8 +341,8 @@ class Attachment(DiscordObject):
         width (:obj:`int`): width of file (if image)
     """
 
-    def __init__(self, id=0, filename="", size=0, url="", proxy_url="",
-                 height=0, width=0):
+    def __init__(self, id=None, filename=None, size=None, url=None, proxy_url=None,
+                 height=None, width=None):
         self.id = id
         self.filename = filename
         self.size = size
@@ -384,10 +384,10 @@ class ChannelMessage(DiscordObject):
         application (MessageApplication): application object sent with Rich Presence-related chat embeds
     """
 
-    def __init__(self, id=0, channel_id=0, author=None, content="", timestamp=None,
+    def __init__(self, id=None, channel_id=None, author=None, content=None, timestamp=None,
                  edited_timestamp=None, tts=False, mention_everyone=False, mentions=[],
                  mention_roles=[], attachments=[], embeds=[], reactions=[],
-                 nonce=0, pinned=False, webhook_id=0, type=0,
+                 nonce=None, pinned=False, webhook_id=None, type=None,
                  activity=MessageActivity(), application=MessageApplication()):
         self.id = id
         self.channel_id = channel_id

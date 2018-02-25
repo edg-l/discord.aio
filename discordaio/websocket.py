@@ -139,7 +139,7 @@ class DiscordWebsocket:
                     elif GatewayOpcodes(opcode) == GatewayOpcodes.HEARTBEAT_ACK:
                         logger.debug(
                             f'Got HEARTBEAT_ACK (new s: {dct["s"]}, old s: {self.seq})')
-                        self.s = dct['s']
+                        self.seq = dct['s']
                     elif GatewayOpcodes(opcode) == GatewayOpcodes.DISPATCH:
                         event_type = dct['t']
                         asyncio.ensure_future(

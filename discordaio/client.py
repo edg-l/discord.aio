@@ -170,6 +170,65 @@ class DiscordBot:
         res = await self.http.request_url('/guilds/' + str(guild_id))
         return await Guild.from_api_res(res)
 
+    async def delete_guild(self, guild_id: int) -> None:
+        """Deletes a guild
+
+        .. versionadded:: 0.2.0
+
+        Args:
+            guild_id (:obj:`int`): The guild id
+
+        Raises:
+            AuthorizationError: Raised if you have no authorization to delete the guild.
+        """
+        return await self.http.request_url(f'/guilds/{guild_id}', type='DELETE')
+
+    async def create_guild_channel(self, guild_id: int, channel: Channel) -> Channel:
+        """Creates a new guild channel
+
+        .. versionadded:: 0.2.1
+
+        Note:
+            Requires the 'MANAGE_CHANNELS' permission.
+            Fires a Channel Create event.
+            All parameters on the channel object are optional excluding 'name'.
+
+        Args:
+            guild_id (:obj:`int`): The guild id
+            channel (:class:`.Channel`): The channel to create
+
+        Returns:
+            Channel: Returns the new channel object
+        """
+
+        data = {}
+        if channel.name is None:
+            raise ValueError(
+                'Channel name must be set when creating a guild channel')
+        else:
+            data['name'] = channel.name
+
+        if channel.type is not None:
+            data['type'] = channel.type
+
+        if channel.bitrate is not None:
+            data['bitrate'] = channel.bitrate
+
+        if channel.user_limit is not None:
+            data['user_limit'] = channel.user_limit
+
+        if channel.permission_overwrites is not None:
+            data['permission_overwrites'] = channel.permission_overwrites
+
+        if channel.parent_id is not None:
+            data['parent_id'] = channel.parent_id
+
+        if channel.nsfw is not None:
+            data['nsfw'] = channel.nsfw
+
+        res = await self.http.request_url(f'/guilds/{guild_id}/channels', type='POST', data=data)
+        return await Channel.from_api_res(res)
+
     async def get_guild_members(self, guild: Guild):
         """Gets and fills the guild with the members info.
 

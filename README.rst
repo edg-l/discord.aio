@@ -82,7 +82,7 @@ Example bot
    logger = logging.getLogger('my_lovely_bot')
 
    if __name__ == '__main__':
-       TOKEN = os.environ['PYDISCORD_TEST_TOKEN']
+       TOKEN = os.environ['DISCORD_TOKEN']
 
        bot = DiscordBot(TOKEN)
 

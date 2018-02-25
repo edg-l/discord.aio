@@ -97,7 +97,6 @@ Example bot
 
 `Here <https://github.com/Ryozuki/discord.aio/blob/master/examples/bot.py>`_ you can find a more extensive example.
 
-You can also check the `documentation <https://ryozuki.github.io/discord.aio/docs>`_ for detailed explanation on how the module works.
 
 TODO
 ----

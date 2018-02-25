@@ -169,6 +169,19 @@ class DiscordBot:
         """
         res = await self.http.request_url('/guilds/' + str(guild_id))
         return await Guild.from_api_res(res)
+    
+    async def get_guild_channels(self, guild_id: int) -> Channel:
+        """Returns a list of channel objects.
+
+        Args:
+            guild_id (:obj:`int`): The guild id
+
+        Returns:
+            :obj:`list` of :class:`.Channel`: The list of channels
+        """
+
+        res = await self.http.request_url(f'/guilds/{guild_id}/channels')
+        return await Channel.from_api_res(res)
 
     async def delete_guild(self, guild_id: int) -> None:
         """Deletes a guild

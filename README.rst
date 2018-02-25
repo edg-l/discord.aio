@@ -71,7 +71,8 @@ Example bot
 -----------
 
 .. code-block:: python
-
+   
+   import asyncio
    import os
    import logging
    from discordaio import DiscordBot

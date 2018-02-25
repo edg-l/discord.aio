@@ -8,6 +8,8 @@ from .constants import DISCORD_CDN
 class Emoji(DiscordObject):
     """Represents a emoji object
 
+    .. versionadded:: 0.2.0
+
     Attributes:
         id (:obj:`int`): emoji id
         name (:obj:`str`): emoji name

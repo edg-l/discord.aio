@@ -14,11 +14,11 @@ logger = logging.getLogger(__name__)
 class GuildEmbed(DiscordObject):
     """Represents a guild embed
 
+    .. versionadded:: 0.2.0
+
     Attributes:
         enabled (:obj:`bool`): if the embed is enabled
         channel_id (:obj:`int`): the embed channel id
-
-    .. versionadded:: 1.3
     """
 
     def __init__(self, enabled=False, channel_id=0):
@@ -28,6 +28,8 @@ class GuildEmbed(DiscordObject):
 
 class GuildMember(DiscordObject):
     """Represents a guild member
+
+    .. versionadded:: 0.2.0
 
     Attributes:
         user (:class:`.User`): user object
@@ -64,6 +66,8 @@ class GuildMember(DiscordObject):
 
 class Guild(DiscordObject):
     """Represents a guild
+
+    .. versionadded:: 0.2.0
 
     Note:
         Guilds in Discord represent an isolated collection of users and channels, and are often referred to as "servers" in the UI.
@@ -166,6 +170,8 @@ class Guild(DiscordObject):
     def is_owner(self, member: GuildMember) -> bool:
         """Returns wether the guild member is the owner of the guild
 
+        .. versionadded:: 0.2.0
+
         Args:
             member (:class:`.GuildMember`): The member
 
@@ -177,12 +183,16 @@ class Guild(DiscordObject):
     def get_icon(self) -> str:
         """Returns the guild icon
 
+        .. versionadded:: 0.2.0
+
         Returns:
             str: The icon link"""
         return DISCORD_CDN + f'/icons/{self.id}/{self.icon}.png'
 
     def get_splash(self):
         """Returns the guild splash
+
+        .. versionadded:: 0.2.0
 
         Returns:
             str: The splash link"""
@@ -198,6 +208,8 @@ class Guild(DiscordObject):
 class IntegrationAccount(DiscordObject):
     """Represents a integration account
 
+    .. versionadded:: 0.2.0
+
     Attributes:
         id (:obj:`str`): id of the account
         name (:obj:`str`): name of the account
@@ -210,6 +222,8 @@ class IntegrationAccount(DiscordObject):
 
 class Integration(DiscordObject):
     """Represents a integration
+
+    .. versionadded:: 0.2.0
 
     Attributes:
         id (:obj:`int`): integration id
@@ -251,6 +265,8 @@ class Integration(DiscordObject):
 
 class Ban(DiscordObject):
     """Represents a ban
+
+    .. versionadded:: 0.2.0
 
     Attributes:
         reason (:obj:`str`): the reason for the ban

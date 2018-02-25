@@ -27,19 +27,21 @@ logger = logging.getLogger(__name__)
 class DiscordBot:
     """This class represents a discord bot object, it has many utility methods for making a bot.
 
+    .. versionadded:: 0.2.0
+
     Attributes:
-        token (str): The discord token used for authentication
-        http (discordaio.http.HTTPHandler): Used for making http requests and websocket creation.
-        guilds (list): The list of guilds the bot is in.
-        user (discordaio.user.User): The user object of the bot.
-        ws (discordaio.websocket.DiscordWebsocket): The websocket used for communication
+        token (:obj:`str`): The discord token used for authentication
+        http (:class:`.HTTPHandler`): Used for making http requests and websocket creation.
+        guilds (:obj:`list` of :class:`.Guild`): The list of guilds the bot is in.
+        user (:class:`.User`): The user object of the bot.
+        ws (:class:`.DiscordWebsocket`): The websocket used for communication
     """
 
     def __init__(self, token: str):
         """DiscordBot constructor.
 
         Args:
-            token (str): The discord token used for authentication.
+            token (obj:`str`): The discord token used for authentication.
         """
         self.token: str = token
         self.http: HTTPHandler = HTTPHandler(token, self)
@@ -50,8 +52,12 @@ class DiscordBot:
         self.ws: Optional[DiscordWebsocket] = None
 
     def run(self) -> None:
+        """Starts the bot, making it connect to discord.
+
+        .. versionadded:: 0.2.0
+        """
         try:
-            self.do_sync(self.start())
+            self.do_sync(self._start())
         except KeyboardInterrupt:
             pass
         except asyncio.CancelledError:
@@ -73,7 +79,10 @@ class DiscordBot:
             pass
 
     def event(self, name: str=None):
-        """DiscordBot event decorator, uses the function's name or the 'name' parameter to subscribe to a event"""
+        """DiscordBot event decorator, uses the function's name or the 'name' parameter to subscribe to a event
+
+        .. versionadded:: 0.2.0
+        """
         def real_event(coro):
             if not asyncio.iscoroutinefunction(coro):
                 raise EventTypeError(
@@ -96,12 +105,20 @@ class DiscordBot:
             return coro
         return real_event
 
-    async def start(self):
+    async def _start(self):
+        """Used internally by the bot to start the http session and the websocket
+
+        .. versionadded:: 0.2.0
+        """
         await self.http.create_session()
         self.ws = DiscordWebsocket(self.http)
         await self.ws.start()
 
     async def exit(self):
+        """Disconnects the bot
+
+        .. versionadded:: 0.2.0
+        """
         if not self.ws.closed:
             await self.ws.close()
         await self.http.close_session()
@@ -111,51 +128,126 @@ class DiscordBot:
         # TODO: Implement this: https://discordapp.com/developers/docs/resources/user#modify-current-user
 
     async def get_user(self, id: int) -> User:
-        """Gets the user object from the given user id."""
+        """Gets the user object from the given user id.
+
+        .. versionadded:: 0.2.0
+
+        Args:
+            id (:obj:`int`): The user id
+
+        Returns:
+            :class:`.User`: The requested user
+        """
         res = await self.http.request_url('/users/' + str(id))
         return await User.from_api_res(res)
 
     async def get_self_user(self) -> User:
-        """Returns the bot user object. (it's like `get_user('@me')`)"""
+        """Returns the bot user object. (it's like `get_user('@me')`)
+
+        .. versionadded:: 0.2.0
+        """
         return await self.get_user("@me")
 
     async def get_guilds(self) -> list:
-        """Returns a list of guilds where the bot is in."""
+        """Returns a list of guilds where the bot is in.
+
+        .. versionadded:: 0.2.0
+        """
         res = await self.http.request_url('/users/@me/guilds')
         return await Guild.from_api_res(res)
 
-    async def get_guild(self, guild_id) -> Guild:
-        """Returns a Guild object from a guild id."""
+    async def get_guild(self, guild_id: int) -> Guild:
+        """Returns a Guild object from a guild id.
+
+        .. versionadded:: 0.2.0
+
+        Args:
+            guild_id (:obj:`int`): The guild id
+
+        Returns:
+            :class:`.Guild`: The requested guild
+        """
         res = await self.http.request_url('/guilds/' + str(guild_id))
         return await Guild.from_api_res(res)
 
     async def get_guild_members(self, guild: Guild):
-        """Gets and fills the guild with the members info"""
+        """Gets and fills the guild with the members info.
+
+        .. versionadded:: 0.2.0
+
+        Args:
+            guild (:class:`.Guild`): The guild to fill the members.
+        """
         res = await self.http.request_url('/guilds/' + guild.id + '/members')
         await guild._fill_members(res)
 
-    async def get_guild_member(self, guild: Guild, member_id: int):
-        """Gets a guild member info for the guild and the member id."""
+    async def get_guild_member(self, guild: Guild, member_id: int) -> GuildMember:
+        """Gets a guild member info for the guild and the member id.
+
+        .. versionadded:: 0.2.0
+
+        Args:
+            guild (:class:`.Guild`): The guild
+            member_id (:obj:`int`): The member id
+
+        Returns:
+            :class:`.GuildMember`: The guild member
+        """
         res = await self.http.request_url('/guilds/' + guild.id + '/members/' + member_id)
         return await GuildMember.from_api_res(res)
 
     async def leave_guild(self, guild_id: int):
-        """Leaves a guild."""
+        """Leaves a guild.
+
+        .. versionadded:: 0.2.0
+
+        Args:
+            guild_id (:obj:`int`): The guild id
+        """
         await self.http.request_url(f'/users/@me/guilds/{guild_id}', type='DELETE')
 
     async def get_channel(self, channel_id: int) -> Channel:
+        """Gets a channel from it's id
+
+        .. versionadded:: 0.2.0
+
+        Args:
+            channel_id (:obj:`int`): The channel id
+
+        Returns:
+            :class:`.Channel`: The channel
+        """
         res = await self.http.request_url(f'/channels/{channel_id}')
         return await Channel.from_api_res(res)
 
     async def delete_channel(self, channel_id: int) -> Channel:
-        """Delete a channel, or close a private message. Requires the 'MANAGE_CHANNELS' permission for the guild. 
-        Deleting a category does not delete its child channels; they will have their parent_id removed and a Channel Update Gateway event will fire for each of them. 
-        Returns a channel object on success. 
-        Fires a Channel Delete Gateway event."""
+        """Deletes a channel.
+
+        Note:
+            Delete a channel, or close a private message. Requires the 'MANAGE_CHANNELS' permission for the guild.
+            Deleting a category does not delete its child channels; they will have their parent_id removed and a Channel Update Gateway event will fire for each of them.
+            Returns a channel object on success.
+            Fires a Channel Delete Gateway event.
+
+        .. versionadded:: 0.2.0
+
+        Args:
+            channel_id (:obj:`int`): The channel id
+
+        Returns:
+            :class:`.Channel`: The deleted channel
+        """
         res = await self.http.request_url(f'/channels/{channel_id}', type='DELETE')
         return await Channel.from_api_res(res)
 
     async def get_dms(self) -> list:
+        """Gets a list of dms.
+
+        .. versionadded:: 0.2.0
+
+        Returns:
+            :obj:`list` of :class:`.Channel`: The DMs channels
+        """
         res = await self.http.request_url('/users/@me/channels')
         return await Channel.from_api_res(res)
 

@@ -173,6 +173,8 @@ class DiscordBot:
     async def get_guild_channels(self, guild_id: int) -> Channel:
         """Returns a list of channel objects.
 
+        .. versionadded:: 0.2.2
+
         Args:
             guild_id (:obj:`int`): The guild id
 
@@ -199,7 +201,7 @@ class DiscordBot:
     async def create_guild_channel(self, guild_id: int, channel: Channel) -> Channel:
         """Creates a new guild channel
 
-        .. versionadded:: 0.2.1
+        .. versionadded:: 0.2.2
 
         Note:
             Requires the 'MANAGE_CHANNELS' permission.

@@ -6,6 +6,18 @@ from .constants import DISCORD_CDN
 
 
 class Emoji(DiscordObject):
+    """Represents a emoji object
+
+    Attributes:
+        id (:obj:`int`): emoji id
+        name (:obj:`str`): emoji name
+        roles (:obj:`list` of :class:`discordaio.role.Role`): object ids roles this emoji is whitelisted to
+        user (:class:`discordaio.user.User`): object user that created this emoji
+        require_colons (:obj:`bool`, optional): whether this emoji must be wrapped in colons
+        managed (:obj:`bool`, optional): whether this emoji is managed
+        animated (:obj:`bool`, optional): whether this emoji is animated
+    """
+
     def __init__(self, id=0, name="", roles=[], user=None, require_colons=False,
                  managed=False, animated=False):
         self.id = id

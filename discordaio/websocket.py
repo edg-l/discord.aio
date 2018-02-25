@@ -56,7 +56,7 @@ class DiscordWebsocket:
             await asyncio.sleep(self.heartbeat_interval / 1000)
             await self.ws.send_json({
                 'op': 1,
-                'd': self.s
+                'd': self.seq
             })
             logger.debug("Sent heartbeat")
 

@@ -196,7 +196,7 @@ class Guild(DiscordObject):
 class IntegrationAccount(DiscordObject):
     """Represents a integration account
 
-    Attribute:
+    Attributes:
         id (:obj:`str`): id of the account
         name (:obj:`str`): name of the account
     """

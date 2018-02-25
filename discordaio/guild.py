@@ -17,6 +17,8 @@ class GuildEmbed(DiscordObject):
     Attributes:
         enabled (:obj:`bool`): if the embed is enabled
         channel_id (:obj:`int`): the embed channel id
+
+    .. versionadded:: 1.3
     """
 
     def __init__(self, enabled=False, channel_id=0):

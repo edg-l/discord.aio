@@ -9,7 +9,7 @@ logging.basicConfig(
 logger = logging.getLogger('test_bot')
 
 if __name__ == '__main__':
-    TOKEN = os.environ['PYDISCORD_TEST_TOKEN']
+    TOKEN = os.environ['DISCORD_TOKEN']
 
     bot = DiscordBot(TOKEN)
 

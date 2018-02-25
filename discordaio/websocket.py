@@ -18,6 +18,20 @@ logger = logging.getLogger(__name__)
 
 
 class DiscordWebsocket:
+    """Class used for handling the websocket connection with the discord gateway
+
+    .. versionadded:: 0.2.0
+
+    Attributes:
+        heartbeat_interval (:obj:`float`): The interval to send pings
+        _trace (:obj:`str`): Used for debugging
+        seq (:obj:`str`): Used in pings
+        session_id (:obj:`str`): Used for resuming
+        http (:class:`HTTPHandler`): Used for sending http requests and session handling.
+        gateway_url (:obj:`str`): The gateway url
+        shards (:obj:`list` of :obj:`int`): Used for opening multiple connections
+        ws (:class:aiohttp.ClientWebSocketResponse``): The websocket
+    """
     def __init__(self, http: HTTPHandler=None, session_id: str=None, shards: list=[]):
         self.heartbeat_interval: float = None
         self._trace: list = []
@@ -47,6 +61,13 @@ class DiscordWebsocket:
             logger.debug("Sent heartbeat")
 
     async def close(self) -> bool:
+        """Closes the websocket
+
+        .. versionadded:: 0.2.0
+
+        Returns:
+            bool: True if succeded closing. False if the websocket was already closed
+        """
         if self.ws is not None and not self.ws.closed:
             if self.heartbeat_future is not None and not self.heartbeat_future.cancelled():
                 self.heartbeat_future.cancel()
@@ -57,6 +78,10 @@ class DiscordWebsocket:
             return False
 
     async def start(self):
+        """Starts the websocket
+
+        .. versionadded:: 0.2.0
+        """
         if self.ws is not None and not self.ws.closed:
             await self.ws.close()
             self.ws = None

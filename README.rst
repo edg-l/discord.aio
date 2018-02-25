@@ -27,6 +27,9 @@ discord.aio
    :target: https://discord.gg/hJ7ewAT
    :alt: Discord
 
+.. image:: https://readthedocs.org/projects/discordaio/badge/?version=latest
+   :target: http://discordaio.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
 
 ..
 

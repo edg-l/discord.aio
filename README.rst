@@ -72,28 +72,30 @@ Example bot
 
 .. code-block:: python
    
-   import asyncio
-   import os
-   import logging
-   from discordaio import DiscordBot
+    import asyncio
+    import os
+    import logging
+    from discordaio import DiscordBot
 
-   logging.basicConfig(
-       level='DEBUG', format='%(asctime)s - %(name)s - %(levelname)s: %(message)s')
-   logger = logging.getLogger('my_lovely_bot')
+    logging.basicConfig(
+        level='DEBUG', format='%(asctime)s - %(name)s - %(levelname)s: %(message)s')
+    logger = logging.getLogger('my_lovely_bot')
 
-   if __name__ == '__main__':
-       TOKEN = os.environ['DISCORD_TOKEN']
+    if __name__ == '__main__':
+        TOKEN = os.environ['DISCORD_TOKEN']
 
-       bot = DiscordBot(TOKEN)
+        bot = DiscordBot(TOKEN)
 
-       @bot.event()
-       async def on_ready():
-           logger.info('Connected!')
-           logger.info(f'My username is {bot.user}')
+        @bot.event()
+        async def on_ready():
+            logger.info('Connected!')
+            logger.info(f'My username is {bot.user}')
 
-       @bot.event('on_message') # You can also use a custom function name.
-       async def foo_bar(message):
-           logger.info(f'{message.author}: {message.content}')
+        @bot.event('on_message') # You can also use a custom function name.
+        async def foo_bar(message):
+            logger.info(f'{message.author}: {message.content}')
+        
+        bot.run()
 
 `Here <https://github.com/Ryozuki/discord.aio/blob/master/examples/bot.py>`_ you can find a more extensive example.
 

@@ -10,7 +10,7 @@ from .user import User, UserConnection
 from .guild import Guild, GuildMember
 from .base import DiscordObject
 from .constants import DISCORD_API_URL
-from .channel import Channel
+from .channel import Channel, ChannelMessage
 from .http import HTTPHandler
 from .websocket import DiscordWebsocket
 
@@ -280,6 +280,9 @@ class DiscordBot:
 
         Args:
             array (:obj:`list` of :obj:`tuple`): A list of tuples containing (channel_id, position)
+        
+        TODO:
+            Improve this function.
         """
         data = []
 
@@ -288,6 +291,50 @@ class DiscordBot:
             data.append({'id': channel_id, 'position': position})
 
         await self.http.request_url(f'/guilds/{guild_id}/channels', type='PATCH', data=data)
+
+    async def modify_channel(self, channel: Channel) -> Channel:
+        """Update a channels settings.
+
+        .. versionadded:: 0.2.2
+
+        Note:
+            Requires the 'MANAGE_CHANNELS' permission for the guild
+        
+        Args:
+            channel (:class:`.Channel`): The channel with the modified attributes, if a attributes is None it won't change.
+        
+        Returns:
+            Channel: Returns a channel on success
+        
+        Raises:
+            BadRequestError: On a request error.
+            AttributeError: if channel id is None.
+        """
+
+        data = {}
+
+        if channel.id is None:
+            raise AttributeError('The channel must have atleast a id.')
+        if channel.position is not None:
+            data['position'] = channel.position
+        if channel.permission_overwrites is not None:
+            data['permission_overwrites'] = channel.permission_overwrites
+        if channel.name is not None:
+            data['name'] = channel.name
+        if channel.topic is not None:
+            data['topic'] = channel.topic
+        if channel.nsfw is not None:
+            data['nsfw'] = channel.nsfw
+        if channel.bitrate is not None:
+            data['bitrate'] = channel.bitrate
+        if channel.user_limit is not None:
+            data['user_limit'] = channel.user_limit
+        if channel.parent_id is not None:
+            data['parent_id'] = channel.parent_id
+
+        res = await self.http.request_url(f'/channels/{channel.id}', data=data)
+        return await Channel.from_api_res(res)
+
 
     async def leave_guild(self, guild_id: int):
         """Leaves a guild.
@@ -312,6 +359,41 @@ class DiscordBot:
         """
         res = await self.http.request_url(f'/channels/{channel_id}')
         return await Channel.from_api_res(res)
+    
+    async def get_messages(self, channel_id: int, limit: int=None, around: int=None, before: int=None, after: int=None) -> list:
+        """Get channel messages
+
+        .. versionadded:: 0.2.2
+
+        Note:
+            If operating on a guild channel, this endpoint requires the 'VIEW_CHANNEL' permission to be present on the current user. 
+            If the current user is missing the 'READ_MESSAGE_HISTORY' permission in the channel then this will return no messages (since they cannot read the message history).
+            You should only use one of the three: `around`, `before`, `after` at the same time. Otherwise they are used in the mentioned order.
+
+        Args:
+            channel_id (:obj:`int`): The channel id
+            limit (:obj:`int`, Optional): How many messages to return. It must be >= 1 and <= 100, if it's less or more, it will use the default value. Defaults to 50.
+            around (:obj:`int`, Optional): Defaults to None. Get messages around this :class:`.ChannelMessage` id. Defaults to None.
+            before (:obj:`int`, Optional): Defaults to None. Get messages before this :class:`.ChannelMessage` id.
+            after (:obj:`int`, Optional): Defaults to None. Get messages after this :class:`.ChannelMessage` id.
+        
+        Returns:
+            Channel: Returns a channel on success
+        """
+
+        params = {}
+
+        if limit is not None and limit <= 100 and limit >= 1:
+            params['limit'] = limit
+        if around is not None:
+            params['around'] = around
+        elif before is not None:
+            params['before'] = before
+        elif after is not None:
+            params['after'] = after
+
+        res = await self.http.request_url(f'/channels/{channel_id}', params=params)
+        return await ChannelMessage.from_api_res(res)
 
     async def delete_channel(self, channel_id: int) -> Channel:
         """Deletes a channel.

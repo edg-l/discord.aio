@@ -50,12 +50,12 @@ class HTTPHandler:
     def get_client(self):
         return self.discord_client
 
-    async def request_url(self, url, type='GET', data=None):
+    async def request_url(self, url, type='GET', data=None, params=None):
 
         while True:
             operation = None
             if type == 'GET':
-                operation = self.session.get(DISCORD_API_URL + url)
+                operation = self.session.get(DISCORD_API_URL + url, params=params)
             elif type == 'POST':
                 operation = self.session.post(DISCORD_API_URL + url, json=data)
             elif type == 'DELETE':

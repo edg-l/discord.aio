@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 0.3.0 (Dev)
+-------------------
+* Fixed async error when closing bot using ctrl-c
+* Fixed DiscordBot#get_messages
+
+
 Version 0.2.2
 -------------
 

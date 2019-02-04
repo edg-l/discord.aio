@@ -3,7 +3,7 @@ import asyncio
 import json
 import time
 import signal
-from typing import Optional, List
+from typing import Optional, List, Tuple, NamedTuple
 
 from .exceptions import EventTypeError
 from .user import User, UserConnection
@@ -15,13 +15,8 @@ from .http import HTTPHandler
 from .websocket import DiscordWebsocket
 
 import logging
-logger = logging.getLogger(__name__)
 
-# TODO: Delete this when sure.
-# def task_handler() -> None:
-#     logger.debug('Stopping tasks')
-#     for task in asyncio.Task.all_tasks():
-#         task.cancel()
+logger = logging.getLogger(__name__)
 
 
 class DiscordBot:
@@ -79,11 +74,12 @@ class DiscordBot:
             # TODO: handle error here
             pass
 
-    def event(self, name: str=None):
+    def event(self, name: str = None):
         """DiscordBot event decorator, uses the function's name or the 'name' parameter to subscribe to a event
 
         .. versionadded:: 0.2.0
         """
+
         def real_event(coro):
             if not asyncio.iscoroutinefunction(coro):
                 raise EventTypeError(
@@ -104,6 +100,7 @@ class DiscordBot:
                 setattr(self, coro.__name__, coro)
             logger.debug(f'{coro.__name__} subscribed succesfully.')
             return coro
+
         return real_event
 
     async def _start(self):
@@ -212,9 +209,6 @@ class DiscordBot:
         Args:
             guild_id (:obj:`int`): The guild id
             channel (:class:`.Channel`): The channel to create
-
-        Returns:
-            Channel: Returns the new channel object
         """
 
         data = {}
@@ -264,14 +258,11 @@ class DiscordBot:
         Args:
             guild (:class:`.Guild`): The guild
             member_id (:obj:`int`): The member id
-
-        Returns:
-            :class:`.GuildMember`: The guild member
         """
-        res = await self.http.request_url('/guilds/' + guild.id + '/members/' + member_id)
+        res = await self.http.request_url(f'/guilds/{guild.id}/members/{member_id}')
         return await GuildMember.from_api_res(res)
 
-    async def move_channels(self, guild_id, array: list):
+    async def move_channels(self, guild_id: int, array: List[Tuple[int, int]]):
         """Modify the positions of a set of channel objects for the guild.
 
         Note:
@@ -279,11 +270,8 @@ class DiscordBot:
             Fires multiple Channel Update events.
             Only channels to be modified are required, with the minimum being a swap between at least two channels.
 
-        Args:
-            array (:obj:`list` of :obj:`tuple`): A list of tuples containing (channel_id, position)
-        
-        TODO:
-            Improve this function.
+        :param guild_id: The id of the guild.
+        :param array: A list of tuples containing (channel_id, position)
         """
         data = []
 
@@ -336,7 +324,6 @@ class DiscordBot:
         res = await self.http.request_url(f'/channels/{channel.id}', data=data)
         return await Channel.from_api_res(res)
 
-
     async def leave_guild(self, guild_id: int):
         """Leaves a guild.
 
@@ -360,8 +347,9 @@ class DiscordBot:
         """
         res = await self.http.request_url(f'/channels/{channel_id}')
         return await Channel.from_api_res(res)
-    
-    async def get_messages(self, channel_id: int, limit: int=None, around: int=None, before: int=None, after: int=None) -> list:
+
+    async def get_messages(self, channel_id: int, limit: int = None, around: int = None, before: int = None,
+                           after: int = None) -> List[ChannelMessage]:
         """Get channel messages
 
         .. versionadded:: 0.2.2
@@ -372,19 +360,16 @@ class DiscordBot:
             You should only use one of the three: `around`, `before`, `after` at the same time. Otherwise they are used in the mentioned order.
 
         Args:
-            channel_id (:obj:`int`): The channel id
-            limit (:obj:`int`, Optional): How many messages to return. It must be >= 1 and <= 100, if it's less or more, it will use the default value. Defaults to 50.
-            around (:obj:`int`, Optional): Defaults to None. Get messages around this :class:`.ChannelMessage` id. Defaults to None.
-            before (:obj:`int`, Optional): Defaults to None. Get messages before this :class:`.ChannelMessage` id.
-            after (:obj:`int`, Optional): Defaults to None. Get messages after this :class:`.ChannelMessage` id.
-        
-        Returns:
-            Channel: Returns a channel on success
+            channel_id: The channel id
+            limit: How many messages to return. It must be >= 1 and <= 100, if it's less or more, it will use the default value. Defaults to 50.
+            around: Defaults to None. Get messages around this :class:`.ChannelMessage` id. Defaults to None.
+            before: Defaults to None. Get messages before this :class:`.ChannelMessage` id.
+            after: Defaults to None. Get messages after this :class:`.ChannelMessage` id.
         """
 
-        params = {}
+        params = dict()
 
-        if limit is not None and limit <= 100 and limit >= 1:
+        if limit is not None and 100 >= limit >= 1:
             params['limit'] = limit
         if around is not None:
             params['around'] = around
@@ -393,7 +378,7 @@ class DiscordBot:
         elif after is not None:
             params['after'] = after
 
-        res = await self.http.request_url(f'/channels/{channel_id}', params=params)
+        res = await self.http.request_url(f'/channels/{channel_id}/messages', params=params)
         return await ChannelMessage.from_api_res(res)
 
     async def delete_channel(self, channel_id: int) -> Channel:

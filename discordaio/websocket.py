@@ -67,7 +67,7 @@ class DiscordWebsocket:
         .. versionadded:: 0.2.0
 
         Returns:
-            bool: True if succeded closing. False if the websocket was already closed
+            bool: True if succeeded closing. False if the websocket was already closed
         """
         if self.ws is not None and not self.ws.closed:
             if self.heartbeat_future is not None and not self.heartbeat_future.cancelled():

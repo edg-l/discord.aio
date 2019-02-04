@@ -1,7 +1,8 @@
 import discordaio
+from .base import DiscordObject
 
 
-class Invite(discordaio.DiscordObject):
+class Invite(DiscordObject):
     """Represents a code that when used, adds a user to a guild.
 
     .. versionadded:: 0.2.0

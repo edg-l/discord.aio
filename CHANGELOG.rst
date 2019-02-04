@@ -8,6 +8,8 @@ Version 0.3.0 (Dev)
 * Added Channel#mention
 * Added Channel#typing
 * Added Channel#delete
+* Added Channel#update
+* Added Channel#refresh
 * Moved DiscordBot#get_messages to Channel#get_messages
 * Moved DiscordBot#leave_guild to Guild#leave
 * Moved DiscordBot#get_guild_member to Guild#get_member
@@ -15,6 +17,7 @@ Version 0.3.0 (Dev)
 * Moved DiscordBot#create_guild_channel to Guild#create_channel
 * Moved DiscordBot#delete_guild to Guild#delete
 * Moved DiscordBot#get_guild_channels to Guild#get_channels
+* Moved DiscordBot#modify_channel to Channel#update
 
 
 Version 0.2.2

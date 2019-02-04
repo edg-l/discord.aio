@@ -62,11 +62,8 @@ class DiscordBot:
                 await getattr(self, event)(*args, **kwargs)
         except asyncio.CancelledError as e:
             logger.error(e, exc_info=1)
-            pass
         except Exception as e:
             logger.error(e, exc_info=1)
-            # TODO: handle error here
-            pass
 
     def event(self, name: str = None):
         """DiscordBot event decorator, uses the function's name or the 'name' parameter to subscribe to a event
@@ -119,7 +116,7 @@ class DiscordBot:
         raise NotImplementedError()
         # TODO: Implement this: https://discordapp.com/developers/docs/resources/user#modify-current-user
 
-    async def get_user(self, id: int) -> User:
+    async def get_user(self, id) -> User:
         """Gets the user object from the given user id.
 
         .. versionadded:: 0.2.0
@@ -140,7 +137,7 @@ class DiscordBot:
         """
         return await self.get_user("@me")
 
-    async def get_guilds(self) -> list:
+    async def get_guilds(self) -> List[Guild]:
         """Returns a list of guilds where the bot is in.
 
         .. versionadded:: 0.2.0
@@ -180,49 +177,6 @@ class DiscordBot:
             data.append({'id': channel_id, 'position': position})
 
         await self.http.request_url(f'/guilds/{guild_id}/channels', type='PATCH', data=data)
-
-    async def modify_channel(self, channel: Channel) -> Channel:
-        """Update a channels settings.
-
-        .. versionadded:: 0.2.2
-
-        Note:
-            Requires the 'MANAGE_CHANNELS' permission for the guild
-        
-        Args:
-            channel (:class:`.Channel`): The channel with the modified attributes, if a attributes is None it won't change.
-        
-        Returns:
-            Channel: Returns a channel on success
-        
-        Raises:
-            BadRequestError: On a request error.
-            AttributeError: if channel id is None.
-        """
-
-        data = {}
-
-        if channel.id is None:
-            raise AttributeError('The channel must have atleast a id.')
-        if channel.position is not None:
-            data['position'] = channel.position
-        if channel.permission_overwrites is not None:
-            data['permission_overwrites'] = channel.permission_overwrites
-        if channel.name is not None:
-            data['name'] = channel.name
-        if channel.topic is not None:
-            data['topic'] = channel.topic
-        if channel.nsfw is not None:
-            data['nsfw'] = channel.nsfw
-        if channel.bitrate is not None:
-            data['bitrate'] = channel.bitrate
-        if channel.user_limit is not None:
-            data['user_limit'] = channel.user_limit
-        if channel.parent_id is not None:
-            data['parent_id'] = channel.parent_id
-
-        res = await self.http.request_url(f'/channels/{channel.id}', data=data)
-        return await Channel.from_api_res(res, self)
 
     async def get_channel(self, channel_id: int) -> Channel:
         """Gets a channel from it's id

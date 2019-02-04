@@ -42,7 +42,7 @@ class Channel(DiscordObject):
 
     Attributes:
         id: the id of this channel
-        value_type: the value_type of channel
+        type: the value_type of channel
         guild_id: the id of the guild
         position: sorting position of the channel
         permission_overwrites: explicit permission overwrites for members and roles
@@ -145,6 +145,52 @@ class Channel(DiscordObject):
 
         res = await self.bot.http.request_url(f'/channels/{self.id}/messages', params=params)
         return await ChannelMessage.from_api_res(res, self.bot)
+
+    async def update(self) -> 'Channel':
+        """Updates the channel using the current channel instance properties.
+
+        .. versionadded:: 0.3.0
+
+        :returns: The updated channel.
+        """
+
+        data = dict()
+
+        if self.id is None:
+            raise AttributeError('The channel must have atleast a id.')
+        if self.position is not None:
+            data['position'] = self.position
+        if self.permission_overwrites is not None:
+            data['permission_overwrites'] = self.permission_overwrites
+        if self.name is not None:
+            data['name'] = self.name
+        if self.topic is not None:
+            data['topic'] = self.topic
+        if self.nsfw is not None:
+            data['nsfw'] = self.nsfw
+        if self.bitrate is not None:
+            data['bitrate'] = self.bitrate
+        if self.user_limit is not None:
+            data['user_limit'] = self.user_limit
+        if self.parent_id is not None:
+            data['parent_id'] = self.parent_id
+
+        res = await self.bot.http.request_url(f'/channels/{self.id}', type='PATCH', data=data)
+        return await Channel.from_api_res(res, self.bot)
+
+    async def refresh(self) -> 'Channel':
+        """Returns a "refreshed" channel instance, may be used to
+        make sure you have the latest state of the channel.
+
+        .. versionadded:: 0.3.0
+
+        Example:
+            `channel = await channel.refresh()`
+
+        :returns: The requested channel.
+        """
+        res = await self.bot.http.request_url(f'/channels/{self.id}')
+        return await Channel.from_api_res(res, self.bot)
 
     async def _from_api_ext(self, key, value):
         if key == 'recipients':

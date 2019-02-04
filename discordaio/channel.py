@@ -4,7 +4,7 @@ from .base import DiscordObject
 from .user import User
 from .role import Role
 from .emoji import Emoji
-
+from typing import List
 
 class Overwrite(DiscordObject):
     """Represents a Overwrite object.
@@ -31,31 +31,33 @@ class Channel(DiscordObject):
     .. versionadded:: 0.2.0
 
     Attributes:
-        id (:obj:`int`): the id of this channel
-        value_type (:obj:`int`): the value_type of channel
-        guild_id (:obj:`int`, optional): the id of the guild
-        position (:obj:`int`, optional): sorting position of the channel
-        permission_overwrites (:obj:`list` of :class:`.Overwrite`, optional): explicit permission overwrites for members and roles
-        name (:obj:`str`, optional): the name of the channel (2-100 characters)
-        topic (:obj:`str`, optional): the channel topic (0-1024 characters)
-        nsfw (:obj:`bool`, optional): if the channel is nsfw
-        last_message_id (:obj:`int`, optional): the id of the last message sent in this channel (may not point to an existing or valid message)
-        bitrate (:obj:`int`, optional): the bitrate (in bits) of the voice channel
-        user_limit (:obj:`int`, optional): the user limit of the voice channel
-        recipients (:obj:`list` of :class:`.User`, optional): the recipients of the DM
-        icon (:obj:`str`, optional): icon hash
-        owner_id (:obj:`int`, optional): id of the DM creator
-        application_id (:obj:`int`, optional): application id of the group DM creator if it is bot-created
-        parent_id (:obj:`int`, optional): id of the parent category for a channel
-        last_pin_timestamp (:obj:`int`, optional): timestamp when the last pinned message was pinned
+        id: the id of this channel
+        value_type: the value_type of channel
+        guild_id: the id of the guild
+        position: sorting position of the channel
+        permission_overwrites: explicit permission overwrites for members and roles
+        name : the name of the channel (2-100 characters)
+        topic the channel topic (0-1024 characters)
+        nsfw: if the channel is nsfw
+        last_message_id: the id of the last message sent in this channel (may not point to an existing or valid message)
+        bitrate: the bitrate (in bits) of the voice channel
+        user_limit: the user limit of the voice channel
+        recipients: the recipients of the DM
+        icon: icon hash
+        owner_id: id of the DM creator
+        application_id application id of the group DM creator if it is bot-created
+        parent_id: id of the parent category for a channel
+        last_pin_timestamp: timestamp when the last pinned message was pinned
     """
 
-    def __init__(self, id=None, type=None, guild_id=None, position=None, permission_overwrites=[],
-                 name=None, topic=None, nsfw=False, last_message_id=None,
-                 bitrate=None, user_limit=None, recipients=[], icon=None,
-                 owner_id=None, application_id=None, parent_id=None, last_pin_timestamp=None):
+    def __init__(self, id: int = None, value_type: int = None,
+                 guild_id: int = None, position: int = None, permission_overwrites: List[Overwrite] = [],
+                 name: str = None, topic: str = None, nsfw: bool = False, last_message_id: int = None,
+                 bitrate: int = None, user_limit: int = None, recipients: List[User] = [], icon: str = None,
+                 owner_id: int = None, application_id: int = None, parent_id: int = None,
+                 last_pin_timestamp: int = None):
         self.id = id
-        self.type = type
+        self.type = value_type
         self.guild_id = guild_id
         self.position = position
         self.permission_overwrites = permission_overwrites
@@ -93,11 +95,11 @@ class MessageActivity(DiscordObject):
     .. versionadded:: 0.2.0
 
     Attributes:
-        type (:obj:`int`): type of message activity
-        party_id (:obj:`str`, optional): party_id from a Rich Presence event
+        type: type of message activity
+        party_id: party_id from a Rich Presence event
     """
 
-    def __init__(self, type=None, party_id=None):
+    def __init__(self, type: int = None, party_id: int = None):
         self.type = type
         self.party_id = party_id
 

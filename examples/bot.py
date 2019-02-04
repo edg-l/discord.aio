@@ -6,7 +6,7 @@ from discordaio import DiscordBot
 
 logging.basicConfig(
     level='DEBUG', format='%(asctime)s - %(name)s - %(levelname)s: %(message)s')
-logger = logging.getLogger('test_bot')
+logger = logging.getLogger(__file__)
 
 if __name__ == '__main__':
     TOKEN = os.environ['DISCORD_TOKEN']
@@ -20,8 +20,7 @@ if __name__ == '__main__':
 
     @bot.event()
     async def on_guild_create(guild):
-        logger.info(
-            f'I\'m connected to {guild.name} guild, it got {len(guild.channels)} channels.')
+        logger.info(f'I\'m connected to {guild.name} guild, it got {len(guild.channels)} channels.')
 
     @bot.event()
     async def on_message(message):

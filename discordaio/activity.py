@@ -81,11 +81,11 @@ class Activity(DiscordObject):
 
     async def _from_api_ext(self, key, value):
         if key == 'timestamps':
-            setattr(self, key, await ActivityTimestamps.from_api_res(value))
+            setattr(self, key, await ActivityTimestamps.from_api_res(value, self.bot))
         elif key == 'party':
-            setattr(self, key, await ActivityParty.from_api_res(value))
+            setattr(self, key, await ActivityParty.from_api_res(value, self.bot))
         elif key == 'assets':
-            setattr(self, key, await ActivityAssets.from_api_res(value))
+            setattr(self, key, await ActivityAssets.from_api_res(value, self.bot))
         else:
             await super()._from_api_ext(key, value)
 

@@ -146,6 +146,86 @@ class Guild(DiscordObject):
         self.channels = channels
         self.presences = presences
 
+    async def leave(self):
+        """Leaves a guild.
+
+        .. versionadded:: 0.3.0
+        """
+        await self.bot.http.request_url(f'/users/@me/guilds/{self.id}', type='DELETE')
+
+    async def get_member(self, member_id: int) -> GuildMember:
+        """Gets a guild member.
+
+        .. versionadded:: 0.3.0
+
+        :param member_id: The member id
+        """
+        res = await self.bot.http.request_url(f'/guilds/{self.id}/members/{member_id}')
+        return await GuildMember.from_api_res(res, self.bot)
+
+    async def get_members(self):
+        """Gets and fills the guild with the members info.
+
+        .. versionadded:: 0.3.0
+        """
+        res = await self.bot.http.request_url(f'/guilds/{self.id}/members')
+        self.members = []
+        for member in res:
+            self.members.append(await GuildMember.from_api_res(member, self.bot))
+
+    async def create_channel(self, channel: Channel) -> Channel:
+        """Creates a new guild channel
+
+        .. versionadded:: 0.3.0
+
+        :param channel: The channel to create.
+        """
+        data = dict()
+        if channel.name is None:
+            raise ValueError('Channel name must be set when creating a guild channel')
+        else:
+            data['name'] = channel.name
+
+        if channel.type is not None:
+            data['type'] = channel.type
+
+        if channel.bitrate is not None:
+            data['bitrate'] = channel.bitrate
+
+        if channel.user_limit is not None:
+            data['user_limit'] = channel.user_limit
+
+        if channel.permission_overwrites is not None:
+            data['permission_overwrites'] = channel.permission_overwrites
+
+        if channel.parent_id is not None:
+            data['parent_id'] = channel.parent_id
+
+        if channel.nsfw is not None:
+            data['nsfw'] = channel.nsfw
+
+        res = await self.bot.http.request_url(f'/guilds/{self.id}/channels', type='POST', data=data)
+        return await Channel.from_api_res(res, self.bot)
+
+    async def get_channels(self) -> Channel:
+        """Returns a list of channels withing the guild.
+
+        .. versionadded:: 0.3.0
+        """
+
+        res = await self.bot.http.request_url(f'/guilds/{self.id}/channels')
+        return await Channel.from_api_res(res, self.bot)
+
+    async def delete(self) -> None:
+        """Deletes the guild
+
+        .. versionadded:: 0.3.0
+
+        Raises:
+            AuthorizationError: Raised if you have no authorization to delete the guild.
+        """
+        return await self.bot.http.request_url(f'/guilds/{self.id}', type='DELETE')
+
     async def _from_api_ext(self, key, value):
         if key == 'roles':
             setattr(self, key, [await Role.from_api_res(x) for x in value])
@@ -161,11 +241,6 @@ class Guild(DiscordObject):
             pass
         else:
             await super()._from_api_ext(key, value)
-
-    async def _fill_members(self, members: list):
-        self.members = []
-        for member in members:
-            self.members.append(await GuildMember.from_api_res(member))
 
     def is_owner(self, member: GuildMember) -> bool:
         """Returns wether the guild member is the owner of the guild

@@ -76,7 +76,7 @@ class HTTPHandler:
                         f"Status is {res.status} so we must wait {limit.retry_after / 1000} seconds!")
                     await asyncio.sleep(limit.retry_after / 1000)
                     logger.debug("Done waiting! Requesting again")
-                elif res.status < 300 and res.status >= 200:
+                elif 300 > res.status >= 200:
                     try:
                         return await res.json()
                     except aiohttp.client_exceptions.ContentTypeError:

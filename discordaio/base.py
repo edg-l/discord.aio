@@ -1,16 +1,18 @@
 import json
 import asyncio
 import aiohttp
-
 import logging
+import discordaio
+
 logger = logging.getLogger(__name__)
 
 
 class DiscordObject:
     """Base class for discord objects."""
+    bot: 'discordaio.DiscordBot' = None
 
     @classmethod
-    async def from_api_res(cls, coro_or_json_or_str):
+    async def from_api_res(cls, coro_or_json_or_str, bot: 'discordaio.DiscordBot' = None):
         """Parses a discord API response"""
 
         if coro_or_json_or_str is None:
@@ -29,6 +31,7 @@ class DiscordObject:
             lst = []
             for item in json_obj:
                 result = cls()
+                result.bot = bot
                 for key, value in item.items():
                     if hasattr(result, key):
                         await result._from_api_ext(key, value)
@@ -36,6 +39,7 @@ class DiscordObject:
             return lst
         elif isinstance(json_obj, dict):
             result = cls()
+            result.bot = bot
             for key, value in json_obj.items():
                 if hasattr(result, key):
                     await result._from_api_ext(key, value)

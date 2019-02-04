@@ -5,6 +5,8 @@ from .user import User
 from .role import Role
 from .emoji import Emoji
 from typing import List
+from enum import Enum
+
 
 class Overwrite(DiscordObject):
     """Represents a Overwrite object.
@@ -23,6 +25,14 @@ class Overwrite(DiscordObject):
         self.type = type
         self.allow = allow
         self.deny = deny
+
+
+class ChannelTypes(Enum):
+    GUILD_TEXT = 0
+    DM = 1
+    GUILD_VOICE = 2
+    GROUP_DM = 3
+    GUILD_CATEGORY = 4
 
 
 class Channel(DiscordObject):
@@ -50,14 +60,14 @@ class Channel(DiscordObject):
         last_pin_timestamp: timestamp when the last pinned message was pinned
     """
 
-    def __init__(self, id: int = None, value_type: int = None,
+    def __init__(self, id: int = None, type: int = ChannelTypes.GUILD_TEXT.value,
                  guild_id: int = None, position: int = None, permission_overwrites: List[Overwrite] = [],
                  name: str = None, topic: str = None, nsfw: bool = False, last_message_id: int = None,
                  bitrate: int = None, user_limit: int = None, recipients: List[User] = [], icon: str = None,
                  owner_id: int = None, application_id: int = None, parent_id: int = None,
                  last_pin_timestamp: int = None):
         self.id = id
-        self.type = value_type
+        self.type = type
         self.guild_id = guild_id
         self.position = position
         self.permission_overwrites = permission_overwrites
@@ -74,11 +84,73 @@ class Channel(DiscordObject):
         self.parent_id = parent_id
         self.last_pin_timestamp = last_pin_timestamp
 
+    async def send_message(self, msg: str, tts=False):
+        """
+        .. versionadded:: 0.3.0
+        :param msg: The message to send. If it's over 2000 chars it will be splitted.
+        :param tts: Wether to send it as a tts message.
+        """
+        if len(msg) <= 2000:
+            await self.bot.http.request_url(f'/channels/{self.id}/messages', type='POST',
+                                       data={
+                                           'content': msg,
+                                           'tts': tts
+                                       })
+        else:
+            for x in range(len(msg) // 2000 + 1):
+                await self.bot.http.request_url(f'/channels/{self.id}/messages', type='POST',
+                                                 data={
+                                                     'content': msg[x * 2000:x * 2000 + 2000],
+                                                     'tts': tts
+                                                 })
+
+    async def typing(self):
+        """Start typing.
+
+        .. versionadded:: 0.3.0
+        """
+        await self.bot.http.request_url(f'/channels/{self.id}/typing', type='POST')
+
+    async def delete(self):
+        """Deletes the channel.
+
+        .. versionadded:: 0.3.0
+        """
+        await self.bot.http.request_url(f'/channels/{self.id}', type='DELETE')
+
+    def mention(self) -> str:
+        """Returns formatted channel mention.
+
+        .. versionadded:: 0.3.0
+        """
+        return f'<#{self.id}>'
+
+    async def get_messages(self, limit: int = None, around: int = None, before: int = None,
+                           after: int = None) -> List['ChannelMessage']:
+        """Gets channel messages
+
+        .. versionadded:: 0.3.0
+        """
+
+        params = dict()
+
+        if limit is not None and 100 >= limit >= 1:
+            params['limit'] = limit
+        if around is not None:
+            params['around'] = around
+        elif before is not None:
+            params['before'] = before
+        elif after is not None:
+            params['after'] = after
+
+        res = await self.bot.http.request_url(f'/channels/{self.id}/messages', params=params)
+        return await ChannelMessage.from_api_res(res, self.bot)
+
     async def _from_api_ext(self, key, value):
         if key == 'recipients':
-            setattr(self, key, [await User.from_api_res(x) for x in value])
+            setattr(self, key, [await User.from_api_res(x, self.bot) for x in value])
         elif key == 'permission_overwrites':
-            setattr(self, key, [await Overwrite.from_api_res(x) for x in value])
+            setattr(self, key, [await Overwrite.from_api_res(x, self.bot) for x in value])
         else:
             return await super()._from_api_ext(key, value)
 
@@ -143,7 +215,7 @@ class Reaction(DiscordObject):
 
     async def _from_api_ext(self, key, value):
         if key == 'emoji':
-            setattr(self, key, await Emoji.from_api_res(value))
+            setattr(self, key, await Emoji.from_api_res(value, self.bot))
         else:
             return await super()._from_api_ext(key, value)
 
@@ -311,19 +383,19 @@ class Embed(DiscordObject):
 
     async def _from_api_ext(self, key, value):
         if key == 'footer':
-            setattr(self, key, await EmbedFooter.from_api_res(value))
+            setattr(self, key, await EmbedFooter.from_api_res(value, self.bot))
         elif key == 'image':
-            setattr(self, key, await EmbedImage.from_api_res(value))
+            setattr(self, key, await EmbedImage.from_api_res(value, self.bot))
         elif key == 'thumbnail':
-            setattr(self, key, await EmbedThumbnail.from_api_res(value))
+            setattr(self, key, await EmbedThumbnail.from_api_res(value, self.bot))
         elif key == 'video':
-            setattr(self, key, await EmbedVideo.from_api_res(value))
+            setattr(self, key, await EmbedVideo.from_api_res(value, self.bot))
         elif key == 'provider':
-            setattr(self, key, await EmbedProvider.from_api_res(value))
+            setattr(self, key, await EmbedProvider.from_api_res(value, self.bot))
         elif key == 'author':
-            setattr(self, key, await EmbedAuthor.from_api_res(value))
+            setattr(self, key, await EmbedAuthor.from_api_res(value, self.bot))
         elif key == 'fields':
-            setattr(self, key, [await EmbedField.from_api_res(x) for x in value])
+            setattr(self, key, [await EmbedField.from_api_res(x, self.bot) for x in value])
         else:
             return await super()._from_api_ext(key, value)
 
@@ -413,19 +485,19 @@ class ChannelMessage(DiscordObject):
 
     async def _from_api_ext(self, key, value):
         if key == 'author':
-            setattr(self, key, await User.from_api_res(value))
+            setattr(self, key, await User.from_api_res(value, self.bot))
         elif key == 'mentions':
-            setattr(self, key, [await User.from_api_res(x) for x in value])
+            setattr(self, key, [await User.from_api_res(x, self.bot) for x in value])
         elif key == 'mention_roles':
-            setattr(self, key, [await Role.from_api_res(x) for x in value])
+            setattr(self, key, [await Role.from_api_res(x, self.bot) for x in value])
         elif key == 'attachments':
-            setattr(self, key, [await Attachment.from_api_res(x) for x in value])
+            setattr(self, key, [await Attachment.from_api_res(x, self.bot) for x in value])
         elif key == 'reactions':
-            setattr(self, key, [await Reaction.from_api_res(x) for x in value])
+            setattr(self, key, [await Reaction.from_api_res(x, self.bot) for x in value])
         elif key == 'activity':
-            setattr(self, key, await MessageActivity.from_api_res(value))
+            setattr(self, key, await MessageActivity.from_api_res(value, self.bot))
         elif key == 'activity':
-            setattr(self, key, await MessageApplication.from_api_res(value))
+            setattr(self, key, await MessageApplication.from_api_res(value, self.bot))
         else:
             return await super()._from_api_ext(key, value)
 

@@ -4,7 +4,17 @@ Changelog
 Version 0.3.0 (Dev)
 -------------------
 * Fixed async error when closing bot using ctrl-c
-* Fixed DiscordBot#get_messages
+* Added Channel#send_message
+* Added Channel#mention
+* Added Channel#typing
+* Added Channel#delete
+* Moved DiscordBot#get_messages to Channel#get_messages
+* Moved DiscordBot#leave_guild to Guild#leave
+* Moved DiscordBot#get_guild_member to Guild#get_member
+* Moved DiscordBot#get_guild_members to Guild#get_members
+* Moved DiscordBot#create_guild_channel to Guild#create_channel
+* Moved DiscordBot#delete_guild to Guild#delete
+* Moved DiscordBot#get_guild_channels to Guild#get_channels
 
 
 Version 0.2.2

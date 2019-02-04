@@ -1,16 +1,10 @@
-import aiohttp
 import asyncio
-import json
-import time
-import signal
-from typing import Optional, List, Tuple, NamedTuple
+from typing import Optional, List, Tuple
 
 from .exceptions import EventTypeError
 from .user import User, UserConnection
-from .guild import Guild, GuildMember
-from .base import DiscordObject
-from .constants import DISCORD_API_URL
-from .channel import Channel, ChannelMessage
+from .guild import Guild
+from .channel import Channel
 from .http import HTTPHandler
 from .websocket import DiscordWebsocket
 
@@ -137,7 +131,7 @@ class DiscordBot:
             :class:`.User`: The requested user
         """
         res = await self.http.request_url('/users/' + str(id))
-        return await User.from_api_res(res)
+        return await User.from_api_res(res, self)
 
     async def get_self_user(self) -> User:
         """Returns the bot user object. (it's like `get_user('@me')`)
@@ -152,7 +146,7 @@ class DiscordBot:
         .. versionadded:: 0.2.0
         """
         res = await self.http.request_url('/users/@me/guilds')
-        return await Guild.from_api_res(res)
+        return await Guild.from_api_res(res, self)
 
     async def get_guild(self, guild_id: int) -> Guild:
         """Returns a Guild object from a guild id.
@@ -166,101 +160,7 @@ class DiscordBot:
             :class:`.Guild`: The requested guild
         """
         res = await self.http.request_url('/guilds/' + str(guild_id))
-        return await Guild.from_api_res(res)
-
-    async def get_guild_channels(self, guild_id: int) -> Channel:
-        """Returns a list of channel objects.
-
-        .. versionadded:: 0.2.2
-
-        Args:
-            guild_id (:obj:`int`): The guild id
-
-        Returns:
-            :obj:`list` of :class:`.Channel`: The list of channels
-        """
-
-        res = await self.http.request_url(f'/guilds/{guild_id}/channels')
-        return await Channel.from_api_res(res)
-
-    async def delete_guild(self, guild_id: int) -> None:
-        """Deletes a guild
-
-        .. versionadded:: 0.2.0
-
-        Args:
-            guild_id (:obj:`int`): The guild id
-
-        Raises:
-            AuthorizationError: Raised if you have no authorization to delete the guild.
-        """
-        return await self.http.request_url(f'/guilds/{guild_id}', type='DELETE')
-
-    async def create_guild_channel(self, guild_id: int, channel: Channel) -> Channel:
-        """Creates a new guild channel
-
-        .. versionadded:: 0.2.2
-
-        Note:
-            Requires the 'MANAGE_CHANNELS' permission.
-            Fires a Channel Create event.
-            All parameters on the channel object are optional excluding 'name'.
-
-        Args:
-            guild_id (:obj:`int`): The guild id
-            channel (:class:`.Channel`): The channel to create
-        """
-
-        data = {}
-        if channel.name is None:
-            raise ValueError(
-                'Channel name must be set when creating a guild channel')
-        else:
-            data['name'] = channel.name
-
-        if channel.type is not None:
-            data['type'] = channel.type
-
-        if channel.bitrate is not None:
-            data['bitrate'] = channel.bitrate
-
-        if channel.user_limit is not None:
-            data['user_limit'] = channel.user_limit
-
-        if channel.permission_overwrites is not None:
-            data['permission_overwrites'] = channel.permission_overwrites
-
-        if channel.parent_id is not None:
-            data['parent_id'] = channel.parent_id
-
-        if channel.nsfw is not None:
-            data['nsfw'] = channel.nsfw
-
-        res = await self.http.request_url(f'/guilds/{guild_id}/channels', type='POST', data=data)
-        return await Channel.from_api_res(res)
-
-    async def get_guild_members(self, guild: Guild):
-        """Gets and fills the guild with the members info.
-
-        .. versionadded:: 0.2.0
-
-        Args:
-            guild (:class:`.Guild`): The guild to fill the members.
-        """
-        res = await self.http.request_url('/guilds/' + guild.id + '/members')
-        await guild._fill_members(res)
-
-    async def get_guild_member(self, guild: Guild, member_id: int) -> GuildMember:
-        """Gets a guild member info for the guild and the member id.
-
-        .. versionadded:: 0.2.0
-
-        Args:
-            guild (:class:`.Guild`): The guild
-            member_id (:obj:`int`): The member id
-        """
-        res = await self.http.request_url(f'/guilds/{guild.id}/members/{member_id}')
-        return await GuildMember.from_api_res(res)
+        return await Guild.from_api_res(res, self)
 
     async def move_channels(self, guild_id: int, array: List[Tuple[int, int]]):
         """Modify the positions of a set of channel objects for the guild.
@@ -322,86 +222,19 @@ class DiscordBot:
             data['parent_id'] = channel.parent_id
 
         res = await self.http.request_url(f'/channels/{channel.id}', data=data)
-        return await Channel.from_api_res(res)
-
-    async def leave_guild(self, guild_id: int):
-        """Leaves a guild.
-
-        .. versionadded:: 0.2.0
-
-        Args:
-            guild_id (:obj:`int`): The guild id
-        """
-        await self.http.request_url(f'/users/@me/guilds/{guild_id}', type='DELETE')
+        return await Channel.from_api_res(res, self)
 
     async def get_channel(self, channel_id: int) -> Channel:
         """Gets a channel from it's id
 
         .. versionadded:: 0.2.0
 
-        Args:
-            channel_id (:obj:`int`): The channel id
-
-        Returns:
-            :class:`.Channel`: The channel
+        :param channel_id: The channel id
         """
         res = await self.http.request_url(f'/channels/{channel_id}')
-        return await Channel.from_api_res(res)
+        return await Channel.from_api_res(res, self)
 
-    async def get_messages(self, channel_id: int, limit: int = None, around: int = None, before: int = None,
-                           after: int = None) -> List[ChannelMessage]:
-        """Get channel messages
-
-        .. versionadded:: 0.2.2
-
-        Note:
-            If operating on a guild channel, this endpoint requires the 'VIEW_CHANNEL' permission to be present on the current user. 
-            If the current user is missing the 'READ_MESSAGE_HISTORY' permission in the channel then this will return no messages (since they cannot read the message history).
-            You should only use one of the three: `around`, `before`, `after` at the same time. Otherwise they are used in the mentioned order.
-
-        Args:
-            channel_id: The channel id
-            limit: How many messages to return. It must be >= 1 and <= 100, if it's less or more, it will use the default value. Defaults to 50.
-            around: Defaults to None. Get messages around this :class:`.ChannelMessage` id. Defaults to None.
-            before: Defaults to None. Get messages before this :class:`.ChannelMessage` id.
-            after: Defaults to None. Get messages after this :class:`.ChannelMessage` id.
-        """
-
-        params = dict()
-
-        if limit is not None and 100 >= limit >= 1:
-            params['limit'] = limit
-        if around is not None:
-            params['around'] = around
-        elif before is not None:
-            params['before'] = before
-        elif after is not None:
-            params['after'] = after
-
-        res = await self.http.request_url(f'/channels/{channel_id}/messages', params=params)
-        return await ChannelMessage.from_api_res(res)
-
-    async def delete_channel(self, channel_id: int) -> Channel:
-        """Deletes a channel.
-
-        .. versionadded:: 0.2.0
-
-        Note:
-            Delete a channel, or close a private message. Requires the 'MANAGE_CHANNELS' permission for the guild.
-            Deleting a category does not delete its child channels; they will have their parent_id removed and a Channel Update Gateway event will fire for each of them.
-            Returns a channel object on success.
-            Fires a Channel Delete Gateway event.
-
-        Args:
-            channel_id (:obj:`int`): The channel id
-
-        Returns:
-            :class:`.Channel`: The deleted channel
-        """
-        res = await self.http.request_url(f'/channels/{channel_id}', type='DELETE')
-        return await Channel.from_api_res(res)
-
-    async def get_dms(self) -> list:
+    async def get_dms(self) -> List[Channel]:
         """Gets a list of dms.
 
         .. versionadded:: 0.2.0
@@ -410,11 +243,11 @@ class DiscordBot:
             :obj:`list` of :class:`.Channel`: The DMs channels
         """
         res = await self.http.request_url('/users/@me/channels')
-        return await Channel.from_api_res(res)
+        return await Channel.from_api_res(res, self)
 
     async def get_connections(self) -> list:
         res = await self.http.request_url('/users/@me/connections')
-        return await UserConnection.from_api_res(res)
+        return await UserConnection.from_api_res(res, self)
 
 
 __all__ = [

@@ -38,4 +38,5 @@ __all__ = [
     'WebSocketCreationError',
     'EventTypeError',
     'AuthorizationError',
+    'UnhandledEndpointStatusError'
 ]

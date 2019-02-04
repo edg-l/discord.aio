@@ -1,5 +1,3 @@
-import json
-
 from .base import DiscordObject
 from .user import User
 from .emoji import Emoji

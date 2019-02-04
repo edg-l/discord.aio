@@ -59,6 +59,7 @@ class DiscordBot:
         try:
             self.do_sync(self._start())
         except KeyboardInterrupt:
+            self.do_sync(self.ws.close())
             pass
         except asyncio.CancelledError:
             logger.debug('Tasks has been cancelled')

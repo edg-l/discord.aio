@@ -14,6 +14,7 @@ from .activity import Activity
 from .voice import VoiceState
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -32,7 +33,8 @@ class DiscordWebsocket:
         shards (:obj:`list` of :obj:`int`): Used for opening multiple connections
         ws (:class:aiohttp.ClientWebSocketResponse``): The websocket
     """
-    def __init__(self, http: HTTPHandler=None, session_id: str=None, shards: list=[]):
+
+    def __init__(self, http: HTTPHandler = None, session_id: str = None, shards: list = []):
         self.heartbeat_interval: float = None
         self._trace: list = []
         self.seq: str = None
@@ -51,8 +53,7 @@ class DiscordWebsocket:
         while True:
             if self.ws is None or self.ws.closed:
                 break
-            logger.debug(
-                f'Waiting {self.heartbeat_interval / 1000} seconds to send heartbeat')
+            logger.debug(f'Waiting {self.heartbeat_interval / 1000} seconds to send heartbeat')
             await asyncio.sleep(self.heartbeat_interval / 1000)
             await self.ws.send_json({
                 'op': 1,
@@ -132,18 +133,14 @@ class DiscordWebsocket:
                                     "large_threshold": 250
                                 }
                             })
-                        logger.debug(
-                            f'Ensuring to heartbeat every {self.heartbeat_interval / 1000} seconds!')
-                        self.heartbeat_future = asyncio.ensure_future(
-                            self.send_heartbeat())
+                        logger.debug(f'Ensuring to heartbeat every {self.heartbeat_interval / 1000} seconds!')
+                        self.heartbeat_future = asyncio.ensure_future(self.send_heartbeat())
                     elif GatewayOpcodes(opcode) == GatewayOpcodes.HEARTBEAT_ACK:
-                        logger.debug(
-                            f'Got HEARTBEAT_ACK (new s: {dct["s"]}, old s: {self.seq})')
+                        logger.debug(f'Got HEARTBEAT_ACK (new s: {dct["s"]}, old s: {self.seq})')
                         self.seq = dct['s']
                     elif GatewayOpcodes(opcode) == GatewayOpcodes.DISPATCH:
                         event_type = dct['t']
-                        asyncio.ensure_future(
-                            self.dispatch_event(event_type, data))
+                        asyncio.ensure_future(self.dispatch_event(event_type, data))
 
     async def dispatch_event(self, event, data):
         if event == 'READY':
@@ -168,7 +165,8 @@ class DiscordWebsocket:
             return await self.http.get_client().raise_event('on_channel_delete', await Channel.from_api_res(data))
 
         elif event == 'CHANNEL_PINS_UPDATE':
-            return await self.http.get_client().raise_event('on_channel_pin', data['channel_id'], data['last_pin_timestamp'])
+            return await self.http.get_client().raise_event('on_channel_pin', data['channel_id'],
+                                                            data['last_pin_timestamp'])
 
         elif event == 'GUILD_CREATE':
             guild = await Guild.from_api_res(data)
@@ -188,7 +186,8 @@ class DiscordWebsocket:
 
         elif event == 'GUILD_EMOJIS_UPDATE':
             guild_id = data['guild_id']
-            return await self.http.get_client().raise_event('on_guild_emojis_update', guild_id, await Emoji.from_api_res(data['emojis']))
+            return await self.http.get_client().raise_event('on_guild_emojis_update', guild_id,
+                                                            await Emoji.from_api_res(data['emojis']))
 
         elif event == 'GUILD_INTEGRATIONS_UPDATE':
             guild_id = data['guild_id']
@@ -196,28 +195,34 @@ class DiscordWebsocket:
 
         elif event == 'GUILD_MEMBER_ADD':
             guild_id = data['guild_id']
-            return await self.http.get_client().raise_event('on_guild_member_add', guild_id, await GuildMember.from_api_res(data))
+            return await self.http.get_client().raise_event('on_guild_member_add', guild_id,
+                                                            await GuildMember.from_api_res(data))
 
         elif event == 'GUILD_MEMBER_REMOVE':
             guild_id = data['guild_id']
-            return await self.http.get_client().raise_event('on_guild_member_remove', guild_id, await User.from_api_res(data['user']))
+            return await self.http.get_client().raise_event('on_guild_member_remove', guild_id,
+                                                            await User.from_api_res(data['user']))
 
         elif event == 'GUILD_MEMBER_UPDATE':
             guild_id = data['guild_id']
             return await self.http.get_client().raise_event('on_guild_member_update', guild_id,
-                                                            await Role.from_api_res(data['roles']), await User.from_api_res(data['user']), data['nick'])
+                                                            await Role.from_api_res(data['roles']),
+                                                            await User.from_api_res(data['user']), data['nick'])
 
         elif event == 'GUILD_MEMBERS_CHUNK':
             guild_id = data['guild_id']
-            return await self.http.get_client().raise_event('on_guild_members_chunk', guild_id, await GuildMember.from_api_res(data['members']))
+            return await self.http.get_client().raise_event('on_guild_members_chunk', guild_id,
+                                                            await GuildMember.from_api_res(data['members']))
 
         elif event == 'GUILD_ROLE_CREATE':
             guild_id = data['guild_id']
-            return await self.http.get_client().raise_event('on_guild_role_create', guild_id, await Role.from_api_res(data['role']))
+            return await self.http.get_client().raise_event('on_guild_role_create', guild_id,
+                                                            await Role.from_api_res(data['role']))
 
         elif event == 'GUILD_ROLE_UPDATE':
             guild_id = data['guild_id']
-            return await self.http.get_client().raise_event('on_guild_role_update', guild_id, await Role.from_api_res(data['role']))
+            return await self.http.get_client().raise_event('on_guild_role_update', guild_id,
+                                                            await Role.from_api_res(data['role']))
 
         elif event == 'GUILD_ROLE_DELETE':
             guild_id = data['guild_id']
@@ -253,11 +258,13 @@ class DiscordWebsocket:
 
         elif event == 'PRESENCE_UPDATE':
             await self.http.get_client().raise_event('on_presence_update', await User.from_api_res(data['user']),
-                                                     data['roles'], await Activity.from_api_res(data.get('game')), data['guild_id'],
+                                                     data['roles'], await Activity.from_api_res(data.get('game')),
+                                                     data['guild_id'],
                                                      data['status'])
 
         elif event == 'TYPING_START':
-            await self.http.get_client().raise_event('on_typing_start', data['user_id'], data['channel_id'], data['timestamp'])
+            await self.http.get_client().raise_event('on_typing_start', data['user_id'], data['channel_id'],
+                                                     data['timestamp'])
 
         elif event == 'USER_UPDATE':
             await self.http.get_client().raise_event('on_user_update', await User.from_api_res(data))
@@ -266,7 +273,8 @@ class DiscordWebsocket:
             await self.http.get_client().raise_event('on_voice_state_update', await VoiceState.from_api_res(data))
 
         elif event == 'VOICE_SERVER_UPDATE':
-            await self.http.get_client().raise_event('on_voice_server_update', data['token'], data['guild_id'], data['endpoint'])
+            await self.http.get_client().raise_event('on_voice_server_update', data['token'], data['guild_id'],
+                                                     data['endpoint'])
 
         elif event == 'WEBHOOKS_UPDATE':
             await self.http.get_client().raise_event('on_webhooks_update', data['guild_id'], data['channel_id'])

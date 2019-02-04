@@ -18,13 +18,14 @@ def find_version(filename):
         return version_match.group(1)
     raise RuntimeError('Unable to find version string.')
 
+
 setup(name='discord.aio',
       version=find_version('discordaio/version.py'),
       description='discord.aio is an asynchronous Discord API wrapper for asyncio and python',
       long_description=long_description,
       url='https://github.com/Ryozuki/discord.aio',
       author='Ryozuki',
-      author_email='contact@ryobyte.com',
+      author_email='ryo@ryozuki.xyz',
       license='MIT',
       packages=['discordaio'],
       install_requires=[

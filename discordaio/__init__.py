@@ -22,5 +22,5 @@ from .activity import Activity, ActivityAssets, ActivityParty, ActivityTimestamp
 from .constants import DISCORD_API_URL, DISCORD_CDN
 from .version import __version__
 
-__author__ = 'Ryozuki'
+__author__ = 'Edgar <git@edgarluque.com>'
 __license__ = 'MIT'

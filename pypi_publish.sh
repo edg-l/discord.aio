@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 
 # Script made to publish the package to https://pypi.python.org/pypi/discord.aio
+pip install --upgrade setuptools wheel
 
 # Go to script directory
 cd `(dirname $0)`
@@ -11,11 +12,7 @@ rm -rf build/
 rm -rf *.egg-info
 
 # Generate files
-python3 setup.py sdist
-python3 setup.py bdist
-
-# Sign
-gpg --detach-sign -a dist/*.tar.gz
+python setup.py sdist bdist_wheel
 
 # Upload
 twine upload dist/*

@@ -39,21 +39,31 @@ class User(DiscordObject):
         discriminator (:obj:`str`): the user's 4-digit discord-tag identify
         avatar (:obj:`str`): the user's avatar hash identify
         bot (:obj:`bool`, optional): whether the user belongs to an OAuth2 application identify
+        system (:obj:`bool`, optional): whether the user is an Official Discord System user (part of the urgent message system) 
         mfa_enabled (:obj:`bool`, optional): whether the user has two factor enabled on their account identify
         verified (:obj:`bool`, optional): whether the email on this account has been verified email
         email (:obj:`str`, optional): the user's email email
+        flags (:obj:`int`, optional): the flags on a user's account
+        premium_type (:obj:`int`, optional): the type of Nitro subscription on a user's account
+        public_flags (:obj:`int`, optional): the public flags on a user's account
     """
 
     def __init__(self, id=0, username="", discriminator="", avatar="", bot=False,
-                 mfa_enabled=False, verified=False, email=""):
+                system=False, mfa_enabled=False, locale="", verified=False, email="", 
+                flags=0, premium_type=0, public_flags=0):
         self.id = id
         self.username = username
         self.discriminator = discriminator
         self.avatar = avatar
         self.bot = bot
+        self.system = system
         self.mfa_enabled = mfa_enabled
+        self.locale = locale
         self.verified = verified
         self.email = email
+        self.flags = flags
+        self.premium_type = premium_type
+        self.public_flags = public_flags
 
     def __str__(self):
         return f'{self.username}#{self.discriminator}'

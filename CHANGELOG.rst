@@ -1,7 +1,11 @@
 Changelog
 =========
 
-Version 0.3.0 (Dev)
+Version 0.4.0 (dev)
+-------------------
+* Updated to discord api v8
+
+Version 0.3.1
 -------------------
 * Fixed async error when closing bot using ctrl-c
 
@@ -35,7 +39,6 @@ Version 0.3.0 (Dev)
 * Moved DiscordBot#get_guild_channels to Guild#get_channels
 * Moved DiscordBot#modify_channel to Channel#update
 
-
 Version 0.2.2
 -------------
 
@@ -56,6 +59,5 @@ Version 0.2.0
 
 Version 0.1.0
 -------------
-
 
 * Initial development version
